@@ -2,99 +2,193 @@ import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 
+const LogoSVG: React.FC = () => {
+  return (
+    <svg viewBox="0 0 400 400" className="w-full h-full drop-shadow-2xl">
+      <defs>
+        {/* Gradientes para simular volumen 3D con luz superior-izquierda */}
+        <radialGradient id="blueGrad" cx="35%" cy="30%" r="75%" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#60a5fa" /> {/* Brillo azul claro */}
+          <stop offset="20%" stopColor="#3b82f6" />
+          <stop offset="45%" stopColor="#1e3a8a" /> {/* Azul corporativo */}
+          <stop offset="75%" stopColor="#172554" />
+          <stop offset="100%" stopColor="#0a1445" /> {/* Azul muy oscuro */}
+        </radialGradient>
+
+        <radialGradient id="darkGrad" cx="35%" cy="30%" r="75%" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#94a3b8" /> {/* Brillo gris claro */}
+          <stop offset="20%" stopColor="#64748b" />
+          <stop offset="45%" stopColor="#334155" /> {/* Gris oscuro */}
+          <stop offset="75%" stopColor="#1e293b" />
+          <stop offset="100%" stopColor="#020617" /> {/* Casi negro */}
+        </radialGradient>
+
+        {/* Reflejo de luz superficial */}
+        <linearGradient id="blueHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="white" stopOpacity="0.4" />
+          <stop offset="40%" stopColor="white" stopOpacity="0.05" />
+          <stop offset="100%" stopColor="white" stopOpacity="0" />
+        </linearGradient>
+
+        <linearGradient id="darkHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="white" stopOpacity="0.25" />
+          <stop offset="40%" stopColor="white" stopOpacity="0.03" />
+          <stop offset="100%" stopColor="white" stopOpacity="0" />
+        </linearGradient>
+
+        {/* Sombra proyectada */}
+        <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="25" stdDeviation="25" floodColor="#000" floodOpacity="0.35" />
+        </filter>
+      </defs>
+
+      {/* Eslabón AZUL (inferior-izquierda, rotado -45°) */}
+      <g transform="translate(175, 245) rotate(-40)" filter="url(#shadow)">
+        {/* Exterior del eslabón */}
+        <path
+          d="M -60 -40
+             A 40 40 0 0 1 -60 40
+             L 60 40
+             A 40 40 0 0 1 60 -40
+             Z
+             M -60 -22
+             A 22 22 0 0 1 -60 22
+             L 60 22
+             A 22 22 0 0 1 60 -22
+             Z"
+          fill="url(#blueGrad)"
+          fillRule="evenodd"
+        />
+        {/* Reflejo de luz */}
+        <path
+          d="M -60 -40
+             A 40 40 0 0 1 -60 40
+             L 60 40
+             A 40 40 0 0 1 60 -40
+             Z
+             M -60 -22
+             A 22 22 0 0 1 -60 22
+             L 60 22
+             A 22 22 0 0 1 60 -22
+             Z"
+          fill="url(#blueHighlight)"
+          fillRule="evenodd"
+        />
+      </g>
+
+      {/* Eslabón NEGRO (superior-derecha, rotado 40°) */}
+      <g transform="translate(235, 165) rotate(40)" filter="url(#shadow)">
+        {/* Exterior del eslabón */}
+        <path
+          d="M -60 -40
+             A 40 40 0 0 1 -60 40
+             L 60 40
+             A 40 40 0 0 1 60 -40
+             Z
+             M -60 -22
+             A 22 22 0 0 1 -60 22
+             L 60 22
+             A 22 22 0 0 1 60 -22
+             Z"
+          fill="url(#darkGrad)"
+          fillRule="evenodd"
+        />
+        {/* Reflejo de luz */}
+        <path
+          d="M -60 -40
+             A 40 40 0 0 1 -60 40
+             L 60 40
+             A 40 40 0 0 1 60 -40
+             Z
+             M -60 -22
+             A 22 22 0 0 1 -60 22
+             L 60 22
+             A 22 22 0 0 1 60 -22
+             Z"
+          fill="url(#darkHighlight)"
+          fillRule="evenodd"
+        />
+      </g>
+    </svg>
+  )
+}
+
 const LogoPrism: React.FC = () => {
   return (
-    <div className="relative w-64 h-64 md:w-96 md:h-96 perspective-[1000px]">
+    <div className="relative w-64 h-64 md:w-80 md:h-80" style={{ perspective: '1200px' }}>
       <motion.div
-        className="w-full h-full relative preserve-3d"
+        className="w-full h-full relative"
         animate={{ rotateY: 360 }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+        transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
         style={{ transformStyle: 'preserve-3d' }}
       >
-        {/* Front face */}
+        {/* ===== CARA FRONTAL: Logo ===== */}
         <div
           className="absolute inset-0 flex items-center justify-center"
-          style={{ backfaceVisibility: 'hidden', transform: 'translateZ(80px)' }}
+          style={{ backfaceVisibility: 'hidden', transform: 'translateZ(120px)' }}
         >
-          <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-2xl">
-            <defs>
-              <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#1e3a8a" />
-                <stop offset="100%" stopColor="#172554" />
-              </linearGradient>
-              <linearGradient id="darkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#334155" />
-                <stop offset="100%" stopColor="#0f172a" />
-              </linearGradient>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-                <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-            </defs>
-            {/* Dark link */}
-            <path d="M120 40C150 40 170 70 170 100C170 130 150 160 120 160C90 160 70 130 70 100C70 70 90 40 120 40Z" fill="url(#darkGrad)" filter="url(#glow)" />
-            {/* Blue link */}
-            <path d="M80 60C110 60 130 90 130 120C130 150 110 180 80 180C50 180 30 150 30 120C30 90 50 60 80 60Z" fill="url(#blueGrad)" filter="url(#glow)" />
-            {/* Intersection highlight */}
-            <ellipse cx="100" cy="110" rx="25" ry="18" fill="#1e3a8a" opacity="0.8" />
-          </svg>
+          <div className="w-full h-full bg-white rounded-3xl shadow-2xl flex items-center justify-center p-8 border border-slate-100">
+            <LogoSVG />
+          </div>
         </div>
 
-        {/* Back face */}
+        {/* ===== CARA TRASERA: Software ===== */}
         <div
           className="absolute inset-0 flex items-center justify-center bg-brand-900 rounded-3xl"
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg) translateZ(80px)' }}
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg) translateZ(120px)' }}
         >
           <div className="text-center text-white p-8">
-            <p className="text-4xl font-bold mb-2">Software</p>
-            <p className="text-brand-200">A medida</p>
+            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-brand-300 mb-3">Servicio</p>
+            <p className="text-5xl font-display font-bold mb-2">Software</p>
+            <p className="text-2xl font-light text-brand-200">a medida</p>
           </div>
         </div>
 
-        {/* Right face */}
+        {/* ===== CARA DERECHA: Redes ===== */}
         <div
           className="absolute inset-0 flex items-center justify-center bg-ink rounded-3xl"
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(90deg) translateZ(80px)' }}
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(90deg) translateZ(120px)' }}
         >
           <div className="text-center text-white p-8">
-            <p className="text-4xl font-bold mb-2">Redes</p>
-            <p className="text-slate-400">Profesionales</p>
+            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-slate-400 mb-3">Servicio</p>
+            <p className="text-5xl font-display font-bold mb-2">Redes</p>
+            <p className="text-2xl font-light text-slate-400">Profesionales</p>
           </div>
         </div>
 
-        {/* Left face */}
+        {/* ===== CARA IZQUIERDA: Automatización ===== */}
         <div
           className="absolute inset-0 flex items-center justify-center bg-brand-600 rounded-3xl"
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(-90deg) translateZ(80px)' }}
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(-90deg) translateZ(120px)' }}
         >
           <div className="text-center text-white p-8">
-            <p className="text-4xl font-bold mb-2">Datos</p>
-            <p className="text-brand-100">Organizados</p>
+            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-brand-200 mb-3">Servicio</p>
+            <p className="text-5xl font-display font-bold mb-2">Automatización</p>
+            <p className="text-2xl font-light text-brand-100">Inteligente</p>
           </div>
         </div>
 
-        {/* Top face */}
+        {/* ===== CARA SUPERIOR: Datos ===== */}
         <div
           className="absolute inset-0 flex items-center justify-center bg-slate-700 rounded-3xl"
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateX(90deg) translateZ(80px)' }}
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateX(90deg) translateZ(120px)' }}
         >
           <div className="text-center text-white p-8">
-            <p className="text-4xl font-bold mb-2">Automatización</p>
-            <p className="text-slate-300">Inteligente</p>
+            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-slate-300 mb-3">Servicio</p>
+            <p className="text-5xl font-display font-bold mb-2">Datos</p>
+            <p className="text-2xl font-light text-slate-300">Organizados</p>
           </div>
         </div>
 
-        {/* Bottom face */}
+        {/* ===== CARA INFERIOR: Diseño ===== */}
         <div
           className="absolute inset-0 flex items-center justify-center bg-brand-800 rounded-3xl"
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateX(-90deg) translateZ(80px)' }}
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateX(-90deg) translateZ(120px)' }}
         >
           <div className="text-center text-white p-8">
-            <p className="text-4xl font-bold mb-2">Consultoría</p>
-            <p className="text-brand-200">Estratégica</p>
+            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-brand-200 mb-3">Servicio</p>
+            <p className="text-5xl font-display font-bold mb-2">Diseño</p>
+            <p className="text-2xl font-light text-brand-200">& Multimedia</p>
           </div>
         </div>
       </motion.div>
@@ -149,17 +243,17 @@ const Hero: React.FC = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
-          className="text-lg md:text-xl text-muted max-w-2xl mx-auto mb-12 font-light leading-relaxed"
+          className="text-lg md:text-xl text-muted max-w-2xl mx-auto mb-16 font-light leading-relaxed"
         >
           Diseñamos soluciones digitales que cualquiera puede entender y todos pueden usar.
           Sin tecnicismos. Solo resultados que se ven en tu día a día.
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
-          className="mb-16"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+          className="mb-20"
         >
           <LogoPrism />
         </motion.div>
@@ -167,7 +261,7 @@ const Hero: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
+          transition={{ duration: 0.8, delay: 0.5, ease: 'easeOut' }}
           className="flex flex-col sm:flex-row gap-4"
         >
           <a
@@ -188,7 +282,7 @@ const Hero: React.FC = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
+        transition={{ delay: 2, duration: 1 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
       >
         <motion.div
