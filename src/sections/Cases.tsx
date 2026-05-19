@@ -2,7 +2,18 @@ import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { TrendingUp, ArrowRight } from 'lucide-react'
 
-const cases = [
+type CaseStudy = {
+  client: string
+  industry: string
+  tags?: string[]
+  challenge: string
+  solution: string
+  result: string
+  metric: string
+  metricLabel: string
+}
+
+const cases: CaseStudy[] = [
   {
     client: 'JMV Logística',
     industry: 'Logística y transporte',
@@ -20,6 +31,26 @@ const cases = [
     result: 'Liberaron 35 horas semanales para enfocarse en mejorar el producto.',
     metric: '-35h',
     metricLabel: 'Ahorro semanal',
+  },
+  {
+    client: 'Smash Gorry',
+    industry: 'Agente de IA · Hostelería',
+    tags: ['Inteligencia Artificial', 'Automatización', 'Integración de APIs'],
+    challenge: 'Recibían los pedidos por mensajes sueltos: confusiones en la comanda, errores frecuentes y alguien siempre pendiente del móvil.',
+    solution: 'Agente de IA conversacional en Telegram (Gemini) que entiende los pedidos en lenguaje natural, los confirma y los envía a cocina y a Firebase de forma automática.',
+    result: 'Los clientes piden a cualquier hora y la comanda llega a cocina sin intervención manual.',
+    metric: '24/7',
+    metricLabel: 'Pedidos atendidos por IA',
+  },
+  {
+    client: 'Three Inmobiliaria',
+    industry: 'Agente de IA · PropTech',
+    tags: ['PropTech', 'Inteligencia Artificial', 'Agentes Autónomos', 'NLP'],
+    challenge: 'El equipo dedicaba horas a filtrar contactos, responder las mismas dudas sobre propiedades y coordinar las presentaciones una a una.',
+    solution: 'Embudo agéntico en WhatsApp que cualifica cada lead, resuelve consultas sobre las propiedades y agenda las presentaciones por Zoom de forma autónoma.',
+    result: 'Cada lead se cualifica y se atiende al instante; al equipo solo llegan los contactos realmente interesados.',
+    metric: 'Auto',
+    metricLabel: 'Cualificación de leads',
   },
 ]
 
@@ -76,6 +107,19 @@ const Cases: React.FC = () => {
                   {item.metric}
                 </div>
               </div>
+
+              {item.tags && (
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {item.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-xs font-medium px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               <div className="space-y-6 mb-10">
                 <div>

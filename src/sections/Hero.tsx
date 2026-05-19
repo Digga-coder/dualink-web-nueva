@@ -244,9 +244,9 @@ const Hero: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.15, ease: 'easeOut' }}
               className="relative text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight text-ink mb-6 leading-[1.1] [text-shadow:0_2px_22px_rgba(248,250,252,0.95),0_0_8px_rgba(248,250,252,0.9)]"
             >
-              Conectamos tu<br />
-              <span className="text-brand-600">negocio</span> con el<br />
-              futuro
+              <span className="text-brand-600">Automatizamos</span><br />
+              los procesos que te<br />
+              hacen perder tiempo
             </motion.h1>
 
             <motion.p
