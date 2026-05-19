@@ -1,20 +1,21 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
-import Logo3D from '../components/Logo3D'
+import Logo3D, { detectQuality, type SceneState } from '../components/Logo3D'
 
 /* ============================================================
    DUALINK HERO — Scrollytelling con cámara cinemática
    ------------------------------------------------------------
-   El clip 3D permanece fijo. El scroll del usuario hace de
-   trigger: la cámara ejecuta un "zoom in" + paneo hacia una
-   cara concreta del modelo, y al llegar aparece la UI del
-   servicio acoplado a esa cara.
-
-   Estado de inactividad (idle): si el usuario no hace scroll
-   tras IDLE_MS, se activa un auto-play que recorre las caras
-   del modelo solo para garantizar que todos los servicios
-   se vean. Cualquier interacción cancela el auto-play.
+   RENDIMIENTO:
+   - El scroll NUNCA mueve la cámara de forma síncrona. Sólo
+     escribe un "target value" en `sceneStateRef` (objeto
+     mutable). La cámara persigue ese target dentro del bucle
+     rAF de Three.js (ver Logo3D / CameraRig).
+   - El árbol del Canvas 3D no se vuelve a renderizar al hacer
+     scroll: Logo3D está memoizado y recibe un ref estable.
+   - Los listeners de scroll/táctiles son PASIVOS.
+   - IntersectionObserver pausa el render WebGL (culling) y el
+     auto-play cuando el Hero sale del viewport.
    ============================================================ */
 
 const services = [
@@ -65,13 +66,27 @@ const AUTOPLAY_MS = 4200
 
 const Hero: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null)
+
+  /* Estado de RENDER (UI). Sólo cambia en eventos discretos,
+     nunca en cada píxel de scroll. */
   const [activeIndex, setActiveIndex] = useState(0)
   const [inIntro, setInIntro] = useState(true)
   const [autoPlay, setAutoPlay] = useState(false)
-  /* Índice cuya cámara YA llegó a destino -> habilita su UI */
   const [settledIndex, setSettledIndex] = useState(-1)
+  const [visible, setVisible] = useState(true)
+
+  /* "Target value" desacoplado: lo lee la cámara dentro de rAF,
+     sin provocar renders de React. */
+  const sceneStateRef = useRef<SceneState>({
+    activeIndex: 0,
+    inIntro: true,
+    autoPlay: false,
+  })
 
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  /* Gama del dispositivo: se calcula una sola vez */
+  const quality = useMemo(() => detectQuality(), [])
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -82,59 +97,88 @@ const Hero: React.FC = () => {
   const introScrollOpacity = useTransform(scrollYProgress, [0, INTRO_PORTION], [1, 0])
   const introScrollY = useTransform(scrollYProgress, [0, INTRO_PORTION], [0, -60])
 
-  /* Sincroniza el servicio activo con el progreso de scroll */
+  /* ----- Scroll => sólo actualiza el TARGET VALUE -----
+     `scrollYProgress.on` usa internamente listeners pasivos.
+     El ref se actualiza siempre; el estado de React sólo si el
+     valor discreto cambia (React descarta el set redundante). */
   useEffect(() => {
     const unsubscribe = scrollYProgress.on('change', (v) => {
       if (v < INTRO_PORTION) {
+        sceneStateRef.current.inIntro = true
+        sceneStateRef.current.activeIndex = 0
         setInIntro(true)
         setActiveIndex(0)
         return
       }
-      setInIntro(false)
       const t = (v - INTRO_PORTION) / (1 - INTRO_PORTION)
       const idx = Math.min(Math.floor(t * services.length), services.length - 1)
+      sceneStateRef.current.inIntro = false
+      sceneStateRef.current.activeIndex = idx
+      setInIntro(false)
       setActiveIndex(idx)
     })
     return () => unsubscribe()
   }, [scrollYProgress])
 
-  /* ----- Temporizador de inactividad -----
-     Cualquier gesto de scroll/teclado cancela el auto-play y
-     reinicia la cuenta atrás. */
+  /* ----- Culling: pausa el render WebGL fuera del viewport ----- */
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { threshold: 0 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  /* ----- Temporizador de inactividad (listeners PASIVOS) ----- */
   useEffect(() => {
     const armIdleTimer = () => {
       setAutoPlay(false)
+      sceneStateRef.current.autoPlay = false
       if (idleTimer.current) clearTimeout(idleTimer.current)
       idleTimer.current = setTimeout(() => setAutoPlay(true), IDLE_MS)
     }
     armIdleTimer()
     window.addEventListener('wheel', armIdleTimer, { passive: true })
     window.addEventListener('touchmove', armIdleTimer, { passive: true })
+    window.addEventListener('touchstart', armIdleTimer, { passive: true })
     window.addEventListener('keydown', armIdleTimer)
     return () => {
       if (idleTimer.current) clearTimeout(idleTimer.current)
       window.removeEventListener('wheel', armIdleTimer)
       window.removeEventListener('touchmove', armIdleTimer)
+      window.removeEventListener('touchstart', armIdleTimer)
       window.removeEventListener('keydown', armIdleTimer)
     }
   }, [])
 
-  /* ----- Auto-play: recorre las caras del modelo en bucle ----- */
+  /* ----- Auto-play: recorre las caras (sólo si el Hero es visible) ----- */
   useEffect(() => {
-    if (!autoPlay) return
+    if (!autoPlay || !visible) {
+      sceneStateRef.current.autoPlay = false
+      return
+    }
+    sceneStateRef.current.autoPlay = true
+    sceneStateRef.current.inIntro = false
     setInIntro(false)
     const id = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % services.length)
+      setActiveIndex((prev) => {
+        const next = (prev + 1) % services.length
+        sceneStateRef.current.activeIndex = next
+        return next
+      })
     }, AUTOPLAY_MS)
     return () => clearInterval(id)
-  }, [autoPlay])
+  }, [autoPlay, visible])
 
   /* Al cambiar de cara, la UI espera a que la cámara llegue */
   useEffect(() => {
     setSettledIndex(-1)
   }, [activeIndex, inIntro])
 
-  /* La cámara avisa cuando termina el movimiento hacia una cara */
+  /* La cámara avisa (desde rAF) cuando termina el movimiento */
   const handleShotSettled = useCallback((index: number) => {
     setSettledIndex(index)
   }, [])
@@ -153,12 +197,14 @@ const Hero: React.FC = () => {
         {/* Halo decorativo */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] rounded-full bg-brand-100/40 blur-3xl pointer-events-none" />
 
-        {/* ===== CLIP 3D — cámara controlada por scroll ===== */}
+        {/* ===== CLIP 3D — cámara controlada por scroll =====
+            Logo3D está memoizado: recibe un ref estable, así que
+            el scroll no provoca renders de este subárbol. */}
         <div className="absolute inset-0 z-10">
           <Logo3D
-            activeIndex={activeIndex}
-            inIntro={inIntro}
-            autoPlayActive={autoPlay}
+            stateRef={sceneStateRef}
+            quality={quality}
+            visible={visible}
             onShotSettled={handleShotSettled}
           />
         </div>
@@ -209,7 +255,7 @@ const Hero: React.FC = () => {
             Aparece SÓLO cuando la cámara ha llegado a esa cara. */}
         <div className="absolute inset-0 z-20 pointer-events-none">
           {services.map((service, i) => {
-            const visible = !inIntro && settledIndex === i
+            const cardVisible = !inIntro && settledIndex === i
             return (
               <motion.div
                 key={service.title}
@@ -220,8 +266,8 @@ const Hero: React.FC = () => {
                 } sm:max-w-sm`}
                 initial={false}
                 animate={{
-                  opacity: visible ? 1 : 0,
-                  x: visible ? 0 : service.align === 'left' ? -50 : 50,
+                  opacity: cardVisible ? 1 : 0,
+                  x: cardVisible ? 0 : service.align === 'left' ? -50 : 50,
                 }}
                 transition={{ duration: 0.55, ease: 'easeOut' }}
               >
