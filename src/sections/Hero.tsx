@@ -219,11 +219,21 @@ const Hero: React.FC = () => {
             style={{ opacity: introScrollOpacity, y: introScrollY }}
             className="absolute inset-0 flex flex-col items-center justify-center text-center px-6"
           >
+            {/* Velo de contraste: aclara el fondo tras el texto para
+                que sea legible aunque el clip 3D oscuro quede detrás */}
+            <div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[160vw] h-[85vh] pointer-events-none"
+              style={{
+                background:
+                  'radial-gradient(ellipse at center, rgba(248,250,252,0.95) 0%, rgba(248,250,252,0.78) 42%, rgba(248,250,252,0) 74%)',
+              }}
+            />
+
             <motion.span
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: 'easeOut' }}
-              className="inline-block px-4 py-1.5 mb-6 rounded-full bg-white/70 backdrop-blur-md border border-slate-200 text-muted text-xs font-semibold tracking-widest uppercase"
+              className="relative inline-block px-4 py-1.5 mb-6 rounded-full bg-white/80 backdrop-blur-md border border-slate-200 text-muted text-xs font-semibold tracking-widest uppercase"
             >
               Tecnología que trabaja por ti
             </motion.span>
@@ -232,7 +242,7 @@ const Hero: React.FC = () => {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.15, ease: 'easeOut' }}
-              className="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight text-ink mb-6 leading-[1.1]"
+              className="relative text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight text-ink mb-6 leading-[1.1] [text-shadow:0_2px_22px_rgba(248,250,252,0.95),0_0_8px_rgba(248,250,252,0.9)]"
             >
               Conectamos tu<br />
               <span className="text-brand-600">negocio</span> con el<br />
@@ -243,7 +253,7 @@ const Hero: React.FC = () => {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
-              className="text-lg md:text-xl text-muted max-w-2xl mx-auto font-light leading-relaxed"
+              className="relative text-base sm:text-lg md:text-xl text-muted max-w-2xl mx-auto font-light leading-relaxed [text-shadow:0_1px_12px_rgba(248,250,252,0.95)]"
             >
               Diseñamos soluciones digitales que cualquiera puede entender.
               Sin tecnicismos. Solo resultados.
@@ -257,35 +267,42 @@ const Hero: React.FC = () => {
           {services.map((service, i) => {
             const cardVisible = !inIntro && settledIndex === i
             return (
-              <motion.div
+              /* Posicionamiento (div externo): en móvil la tarjeta
+                 se ancla abajo, a lo ancho con márgenes seguros; en
+                 sm+ pasa a un lateral y se centra en vertical.
+                 La animación va en el motion.div interno para no
+                 mezclar transforms de layout con los de animación. */
+              <div
                 key={service.title}
-                className={`absolute top-1/2 -translate-y-1/2 w-[86%] sm:w-auto left-1/2 sm:left-auto -translate-x-1/2 sm:translate-x-0 ${
+                className={`absolute left-4 right-4 bottom-6 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:w-auto sm:max-w-sm ${
                   service.align === 'left'
-                    ? 'sm:left-8 md:left-16 lg:left-24'
-                    : 'sm:right-8 md:right-16 lg:right-24'
-                } sm:max-w-sm`}
-                initial={false}
-                animate={{
-                  opacity: cardVisible ? 1 : 0,
-                  x: cardVisible ? 0 : service.align === 'left' ? -50 : 50,
-                }}
-                transition={{ duration: 0.55, ease: 'easeOut' }}
+                    ? 'sm:right-auto sm:left-8 md:left-16 lg:left-24'
+                    : 'sm:left-auto sm:right-8 md:right-16 lg:right-24'
+                }`}
               >
-                <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-slate-200 shadow-2xl shadow-slate-900/10">
+                <motion.div
+                  initial={false}
+                  animate={{
+                    opacity: cardVisible ? 1 : 0,
+                    y: cardVisible ? 0 : 24,
+                  }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  className="bg-white/85 backdrop-blur-xl rounded-2xl p-5 sm:p-6 md:p-8 border border-slate-200 shadow-2xl shadow-slate-900/10"
+                >
                   <span
-                    className="text-xs font-semibold tracking-[0.25em] uppercase block mb-2"
+                    className="text-[0.7rem] sm:text-xs font-semibold tracking-[0.2em] sm:tracking-[0.25em] uppercase block mb-2"
                     style={{ color: service.accent }}
                   >
                     Servicio {String(i + 1).padStart(2, '0')} / 06
                   </span>
-                  <h3 className="text-2xl md:text-3xl font-display font-bold text-ink mb-2 leading-tight">
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-display font-bold text-ink mb-2 leading-tight">
                     {service.title}
                   </h3>
                   <p className="text-muted text-sm md:text-base leading-relaxed">
                     {service.subtitle}
                   </p>
-                </div>
-              </motion.div>
+                </motion.div>
+              </div>
             )
           })}
         </div>
@@ -306,14 +323,15 @@ const Hero: React.FC = () => {
 
         {/* ===== AVISO DE AUTO-PLAY (modo inactividad) ===== */}
         <motion.div
-          className="absolute top-6 left-1/2 -translate-x-1/2 z-30"
+          className="absolute top-5 sm:top-6 left-1/2 -translate-x-1/2 z-30 w-max max-w-[92vw]"
           animate={{ opacity: autoPlay ? 1 : 0, y: autoPlay ? 0 : -10 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/70 backdrop-blur-md border border-slate-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-600 animate-pulse" />
-            <span className="text-xs font-medium tracking-widest uppercase text-muted">
-              Recorrido automático · desliza para tomar el control
+          <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-slate-200">
+            <span className="w-1.5 h-1.5 shrink-0 rounded-full bg-brand-600 animate-pulse" />
+            <span className="text-[0.65rem] sm:text-xs font-medium tracking-widest uppercase text-muted whitespace-nowrap">
+              Recorrido automático
+              <span className="hidden sm:inline"> · desliza para tomar el control</span>
             </span>
           </div>
         </motion.div>
