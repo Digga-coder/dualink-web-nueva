@@ -55,6 +55,12 @@ const services = [
     align: 'right' as const,
     accent: '#334155',
   },
+  {
+    title: 'Gestión de Redes Sociales',
+    subtitle: 'Llevamos todas tus redes: contenido, diseño y comunidad.',
+    align: 'left' as const,
+    accent: '#1e3a8a',
+  },
 ]
 
 /* Proporción del scroll reservada a la intro */
@@ -293,7 +299,8 @@ const Hero: React.FC = () => {
                     className="text-[0.7rem] sm:text-xs font-semibold tracking-[0.2em] sm:tracking-[0.25em] uppercase block mb-2"
                     style={{ color: service.accent }}
                   >
-                    Servicio {String(i + 1).padStart(2, '0')} / 06
+                    Servicio {String(i + 1).padStart(2, '0')} /{' '}
+                    {String(services.length).padStart(2, '0')}
                   </span>
                   <h3 className="text-xl sm:text-2xl md:text-3xl font-display font-bold text-ink mb-2 leading-tight">
                     {service.title}

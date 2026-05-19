@@ -62,6 +62,7 @@ const SHOTS: Shot[] = [
   { pos: [-3.9, 1.6, 3.6], target: [0, 0.6, 0] },
   { pos: [0.6, 3.3, 4.3], target: [0, 1.1, 0] },
   { pos: [-3.0, -2.4, 3.8], target: [0, -0.7, 0] },
+  { pos: [-2.6, -1.6, 4.2], target: [-0.1, -0.2, 0] },
 ]
 
 /* ----- Nivel de detalle (LOD) por gama de dispositivo -----

@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Code2, Wifi, Bot, Database, Palette, ArrowUpRight } from 'lucide-react'
+import { Code2, Wifi, Bot, Database, Palette, Share2, ArrowUpRight } from 'lucide-react'
 
 interface ServiceData {
   id: string
@@ -76,6 +76,18 @@ const services: ServiceData[] = [
     bgColor: 'bg-brand-50',
     textColor: 'text-ink',
   },
+  {
+    id: 'redes-sociales',
+    number: '06',
+    title: 'Gestión de Redes Sociales',
+    subtitle: 'Llevamos todas tus redes',
+    description: 'Nos encargamos de toda tu presencia en redes sociales: creamos el contenido, lo publicamos y cuidamos tu comunidad. Tú te centras en tu negocio y nosotros hacemos que se note en Instagram, Facebook, TikTok, LinkedIn y donde haga falta.',
+    details: ['Gestión de Instagram, Facebook, TikTok y LinkedIn', 'Calendario de contenidos y publicaciones', 'Diseño de posts, reels y stories', 'Informes de resultados y crecimiento'],
+    icon: <Share2 className="w-8 h-8" />,
+    color: 'bg-slate-100',
+    bgColor: 'bg-slate-100',
+    textColor: 'text-ink',
+  },
 ]
 
 const ServiceCard: React.FC<{ service: ServiceData; index: number }> = ({ service, index }) => {
@@ -108,7 +120,7 @@ const ServiceCard: React.FC<{ service: ServiceData; index: number }> = ({ servic
             <div className="lg:w-1/2">
               <div className="flex items-center gap-4 mb-6">
                 <span className="text-sm font-semibold tracking-widest uppercase opacity-50">
-                  Servicio {service.number} / 05
+                  Servicio {service.number} / {String(services.length).padStart(2, '0')}
                 </span>
               </div>
 
@@ -177,7 +189,7 @@ const Services: React.FC = () => {
           Qué hacemos
         </span>
         <h2 className="text-4xl md:text-5xl font-display font-bold tracking-tight text-ink max-w-3xl mx-auto">
-          Cinco formas de hacer crecer tu negocio
+          Seis formas de hacer crecer tu negocio
         </h2>
       </div>
 
