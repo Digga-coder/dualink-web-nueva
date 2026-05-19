@@ -56,12 +56,12 @@ const cases: CaseStudy[] = [
   {
     client: 'Thermocork',
     industry: 'Construcción y aislamiento ecológico',
-    tags: ['Web corporativa', 'Next.js 14', 'Bilingüe ES/EN', 'Animación por scroll', 'PWA', 'SEO'],
-    challenge: 'Thermocork necesitaba una presencia digital a la altura de un producto técnico y premium: explicar el corcho proyectado, sus ventajas ecológicas y las subvenciones disponibles, y captar clientes tanto nacionales como internacionales.',
-    solution: 'Web corporativa premium y completa (en desarrollo): bilingüe ES/EN, con catálogo de productos, casos de aplicación, ventajas ecológicas, proceso de instalación, datos y estadísticas, información de subvenciones, área de formación, sección internacional, testimonios y contacto. Todo con animaciones por scroll (GSAP + Lenis), vídeo inmersivo del producto y PWA instalable.',
-    result: 'Un sitio rápido, instalable y optimizado para SEO que presenta toda la propuesta de Thermocork y lo posiciona como referente del aislamiento ecológico.',
-    metric: 'ES/EN',
-    metricLabel: 'Web bilingüe internacional',
+    tags: ['Transformación digital', 'Web premium', 'Agente RAG (IA)', 'Automatización'],
+    challenge: 'El crecimiento de la facturación estaba atado a la carga de trabajo manual de la dirección: el papeleo y las tareas repetitivas frenaban el escalado del negocio.',
+    solution: 'Plan Director de Transformación Digital 2026: web corporativa premium "Industrial Luxury" con galería de obras reales y zona B2B restringida, un Agente RAG que funciona como cerebro corporativo de consulta, un agente de inteligencia de reuniones y la automatización de pedidos omnicanal con trazabilidad.',
+    result: 'El objetivo: una empresa donde el material sea físico pero la gestión sea 100% digital, rápida y sin papeleo. Proyecto en desarrollo.',
+    metric: '100%',
+    metricLabel: 'Gestión digital, sin papeleo',
   },
 ]
 
