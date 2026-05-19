@@ -25,12 +25,13 @@ const cases: CaseStudy[] = [
   },
   {
     client: 'Frecuenzy',
-    industry: 'Tecnología y eventos',
-    challenge: 'El equipo de soporte pasaba 40 horas semanales respondiendo las mismas preguntas una y otra vez.',
-    solution: 'Sistema de tickets inteligente con respuestas automáticas para consultas frecuentes.',
-    result: 'Liberaron 35 horas semanales para enfocarse en mejorar el producto.',
-    metric: '-35h',
-    metricLabel: 'Ahorro semanal',
+    industry: 'Hostelería y ocio nocturno',
+    tags: ['SaaS', 'Tiempo real', 'PWA', 'POS móvil'],
+    challenge: 'Gestionaban las comandas y los cobros de la barra sobre la marcha, sin control en tiempo real de las ventas ni del rendimiento de cada camarero.',
+    solution: 'SaaS de punto de venta (POS) en tiempo real: app móvil para los camareros con lógica de combinados, panel de administración con métricas de ventas y módulos de control de acceso y tickets.',
+    result: 'El equipo de sala cobra desde el móvil y la dirección ve las ventas al instante, con todo el local conectado en una sola app instalable.',
+    metric: 'Tiempo real',
+    metricLabel: 'Control de ventas y comandas',
   },
   {
     client: 'Smash Gorry',
@@ -102,8 +103,8 @@ const Cases: React.FC = () => {
                     {item.client}
                   </h3>
                 </div>
-                <div className="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full text-sm font-semibold">
-                  <TrendingUp className="w-4 h-4" />
+                <div className="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap shrink-0">
+                  <TrendingUp className="w-4 h-4 shrink-0" />
                   {item.metric}
                 </div>
               </div>
