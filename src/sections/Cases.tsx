@@ -53,6 +53,16 @@ const cases: CaseStudy[] = [
     metric: 'Auto',
     metricLabel: 'Cualificación de leads',
   },
+  {
+    client: 'Thermocork',
+    industry: 'Construcción y aislamiento ecológico',
+    tags: ['Web corporativa', 'Next.js', 'Bilingüe ES/EN', 'Animación por scroll'],
+    challenge: 'Necesitaban una presencia digital a la altura de un producto técnico y premium, capaz de explicar el aislamiento de corcho proyectado y llegar a clientes nacionales e internacionales.',
+    solution: 'Web corporativa premium (en desarrollo): bilingüe ES/EN, con animaciones por scroll, vídeo inmersivo del producto y secciones de aplicaciones, proceso, subvenciones y formación.',
+    result: 'Una web rápida, instalable (PWA) y optimizada para SEO que posiciona a Thermocork como referente del aislamiento ecológico.',
+    metric: 'ES/EN',
+    metricLabel: 'Web bilingüe internacional',
+  },
 ]
 
 const Cases: React.FC = () => {
