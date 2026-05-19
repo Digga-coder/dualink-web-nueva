@@ -235,7 +235,7 @@ const Hero: React.FC = () => {
               transition={{ duration: 0.8, ease: 'easeOut' }}
               className="relative inline-block px-4 py-1.5 mb-6 rounded-full bg-white/80 backdrop-blur-md border border-slate-200 text-muted text-xs font-semibold tracking-widest uppercase"
             >
-              Tecnología que trabaja por ti
+              Software a medida y automatización
             </motion.span>
 
             <motion.h1
@@ -244,9 +244,9 @@ const Hero: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.15, ease: 'easeOut' }}
               className="relative text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight text-ink mb-6 leading-[1.1] [text-shadow:0_2px_22px_rgba(248,250,252,0.95),0_0_8px_rgba(248,250,252,0.9)]"
             >
-              <span className="text-brand-600">Automatizamos</span><br />
-              los procesos que te<br />
-              hacen perder tiempo
+              <span className="text-brand-600">Automatizamos</span> procesos<br />
+              con tecnología que<br />
+              trabaja por ti
             </motion.h1>
 
             <motion.p
