@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import Logo3D, { detectQuality, type SceneState } from '../components/Logo3D'
 
 /* ============================================================
@@ -91,6 +91,15 @@ const Hero: React.FC = () => {
 
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  /* Reinicia el temporizador de inactividad (compartido entre
+     los listeners de scroll y los botones de navegación) */
+  const resetIdleTimer = useCallback(() => {
+    setAutoPlay(false)
+    sceneStateRef.current.autoPlay = false
+    if (idleTimer.current) clearTimeout(idleTimer.current)
+    idleTimer.current = setTimeout(() => setAutoPlay(true), IDLE_MS)
+  }, [])
+
   /* Gama del dispositivo: se calcula una sola vez */
   const quality = useMemo(() => detectQuality(), [])
 
@@ -140,25 +149,19 @@ const Hero: React.FC = () => {
 
   /* ----- Temporizador de inactividad (listeners PASIVOS) ----- */
   useEffect(() => {
-    const armIdleTimer = () => {
-      setAutoPlay(false)
-      sceneStateRef.current.autoPlay = false
-      if (idleTimer.current) clearTimeout(idleTimer.current)
-      idleTimer.current = setTimeout(() => setAutoPlay(true), IDLE_MS)
-    }
-    armIdleTimer()
-    window.addEventListener('wheel', armIdleTimer, { passive: true })
-    window.addEventListener('touchmove', armIdleTimer, { passive: true })
-    window.addEventListener('touchstart', armIdleTimer, { passive: true })
-    window.addEventListener('keydown', armIdleTimer)
+    resetIdleTimer()
+    window.addEventListener('wheel', resetIdleTimer, { passive: true })
+    window.addEventListener('touchmove', resetIdleTimer, { passive: true })
+    window.addEventListener('touchstart', resetIdleTimer, { passive: true })
+    window.addEventListener('keydown', resetIdleTimer)
     return () => {
       if (idleTimer.current) clearTimeout(idleTimer.current)
-      window.removeEventListener('wheel', armIdleTimer)
-      window.removeEventListener('touchmove', armIdleTimer)
-      window.removeEventListener('touchstart', armIdleTimer)
-      window.removeEventListener('keydown', armIdleTimer)
+      window.removeEventListener('wheel', resetIdleTimer)
+      window.removeEventListener('touchmove', resetIdleTimer)
+      window.removeEventListener('touchstart', resetIdleTimer)
+      window.removeEventListener('keydown', resetIdleTimer)
     }
-  }, [])
+  }, [resetIdleTimer])
 
   /* ----- Auto-play: recorre las caras (sólo si el Hero es visible) ----- */
   useEffect(() => {
@@ -178,6 +181,28 @@ const Hero: React.FC = () => {
     }, AUTOPLAY_MS)
     return () => clearInterval(id)
   }, [autoPlay, visible])
+
+  /* ----- Navegación programática por scroll hacia una cara ----- */
+  const navigateTo = useCallback((targetIndex: number) => {
+    const el = containerRef.current
+    if (!el) return
+    resetIdleTimer()
+    const totalVh = 100 + services.length * 95
+    const containerHeight = (totalVh / 100) * window.innerHeight
+    const maxScroll = containerHeight - window.innerHeight
+    const t = (targetIndex + 0.5) / services.length
+    const progress = INTRO_PORTION + t * (1 - INTRO_PORTION)
+    const top = el.getBoundingClientRect().top + window.scrollY + progress * maxScroll
+    window.scrollTo({ top, behavior: 'smooth' })
+  }, [resetIdleTimer])
+
+  const goToIntro = useCallback(() => {
+    const el = containerRef.current
+    if (!el) return
+    resetIdleTimer()
+    const top = el.getBoundingClientRect().top + window.scrollY
+    window.scrollTo({ top, behavior: 'smooth' })
+  }, [resetIdleTimer])
 
   /* Al cambiar de cara, la UI espera a que la cámara llegue */
   useEffect(() => {
@@ -359,6 +384,30 @@ const Hero: React.FC = () => {
             </span>
             <ChevronDown className="w-5 h-5 text-muted" />
           </motion.div>
+        </motion.div>
+
+        {/* ===== BOTONES DE NAVEGACIÓN PREV / NEXT ===== */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3"
+          animate={{ opacity: !inIntro ? 1 : 0, y: !inIntro ? 0 : 12 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+          style={{ pointerEvents: !inIntro ? 'auto' : 'none' }}
+        >
+          <button
+            onClick={() => activeIndex === 0 ? goToIntro() : navigateTo(activeIndex - 1)}
+            aria-label="Servicio anterior"
+            className="flex items-center justify-center w-11 h-11 rounded-full bg-white/85 backdrop-blur-md border border-slate-200 shadow-lg text-ink hover:bg-white hover:scale-105 active:scale-95 transition-all duration-150"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => navigateTo(activeIndex + 1)}
+            disabled={activeIndex === services.length - 1}
+            aria-label="Servicio siguiente"
+            className="flex items-center justify-center w-11 h-11 rounded-full bg-white/85 backdrop-blur-md border border-slate-200 shadow-lg text-ink hover:bg-white hover:scale-105 active:scale-95 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </motion.div>
       </div>
     </section>
