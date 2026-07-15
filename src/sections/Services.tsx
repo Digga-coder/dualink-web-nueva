@@ -1,202 +1,113 @@
 import { useRef } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { Code2, Wifi, Bot, Database, Palette, Share2, ArrowUpRight } from 'lucide-react'
+import { motion, useInView } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
+import { services, type Service } from '../config/services'
+import { whatsappHref, waMessages } from '../config/site'
+import WhatsAppIcon from '../components/WhatsAppIcon'
 
-interface ServiceData {
-  id: string
-  number: string
-  title: string
-  subtitle: string
-  description: string
-  details: string[]
-  icon: React.ReactNode
-  color: string
-  bgColor: string
-  textColor: string
-}
+/* ============================================================
+   DUALINK · SERVICIOS
+   ------------------------------------------------------------
+   Antes: 6 tarjetas `sticky h-screen` = 600vh de scroll para ver
+   seis servicios, uno cada vez, y ninguna forma de compararlos.
+   Quien buscaba algo concreto tenía que atravesarlos todos.
 
-const services: ServiceData[] = [
-  {
-    id: 'software',
-    number: '01',
-    title: 'Software a Medida',
-    subtitle: 'Programas que se adaptan a ti',
-    description: '¿Usas hojas de cálculo para gestionar tu negocio? Creamos aplicaciones hechas a tu medida que automatizan exactamente lo que necesitas, sin pagar por funciones que no usarás.',
-    details: ['Aplicaciones web y móviles', 'Sistemas de gestión interna', 'Integración con tus herramientas actuales', 'Escalable a medida que creces'],
-    icon: <Code2 className="w-8 h-8" />,
-    color: 'bg-white',
-    bgColor: 'bg-white',
-    textColor: 'text-ink',
-  },
-  {
-    id: 'redes',
-    number: '02',
-    title: 'Redes y Conectividad',
-    subtitle: 'Conexión sin interrupciones',
-    description: 'Instalamos y mantenemos redes rápidas, seguras y estables para tu oficina, almacén o negocio. Olvídate de cortes, lentitud y zonas sin cobertura.',
-    details: ['Instalación de redes cableadas y WiFi', 'Configuración de servidores', 'Seguridad y protección de datos', 'Mantenimiento continuo'],
-    icon: <Wifi className="w-8 h-8" />,
-    color: 'bg-brand-900',
-    bgColor: 'bg-brand-900',
-    textColor: 'text-white',
-  },
-  {
-    id: 'automatizacion',
-    number: '03',
-    title: 'Automatización Inteligente',
-    subtitle: 'Que las máquinas trabajen por ti',
-    description: 'Imagina que las tareas repetitivas de tu negocio se hicieran solas. Respondemos emails, organizamos citas, gestionamos pedidos y más, mientras tú te enfocas en lo importante.',
-    details: ['Respuesta automática a clientes', 'Gestión de citas y pedidos', 'Flujos de trabajo automáticos', 'Conexión entre tus apps favoritas'],
-    icon: <Bot className="w-8 h-8" />,
-    color: 'bg-slate-100',
-    bgColor: 'bg-slate-100',
-    textColor: 'text-ink',
-  },
-  {
-    id: 'datos',
-    number: '04',
-    title: 'Organización de Datos',
-    subtitle: 'Tu información, donde y cuando la necesites',
-    description: 'Tus datos son oro. Los organizamos, limpiamos y ponemos a tu disposición para que puedas tomar mejores decisiones en segundos, no en días.',
-    details: ['Bases de datos centralizadas', 'Informes automáticos', 'Migración de datos segura', 'Copias de seguridad en la nube'],
-    icon: <Database className="w-8 h-8" />,
-    color: 'bg-ink',
-    bgColor: 'bg-ink',
-    textColor: 'text-white',
-  },
-  {
-    id: 'multimedia',
-    number: '05',
-    title: 'Diseño y Multimedia',
-    subtitle: 'Imagen que vende',
-    description: 'Desde tu web hasta tus redes sociales. Creamos diseños profesionales que transmiten confianza y hacen que los clientes elijan verte antes que a la competencia.',
-    details: ['Diseño web profesional', 'Identidad visual de marca', 'Edición de video y fotografía', 'Gestión de redes sociales'],
-    icon: <Palette className="w-8 h-8" />,
-    color: 'bg-brand-50',
-    bgColor: 'bg-brand-50',
-    textColor: 'text-ink',
-  },
-  {
-    id: 'redes-sociales',
-    number: '06',
-    title: 'Gestión de Redes Sociales',
-    subtitle: 'Llevamos todas tus redes',
-    description: 'Nos encargamos de toda tu presencia en redes sociales: creamos el contenido, lo publicamos y cuidamos tu comunidad. Tú te centras en tu negocio y nosotros hacemos que se note en Instagram, Facebook, TikTok, LinkedIn y donde haga falta.',
-    details: ['Gestión de Instagram, Facebook, TikTok y LinkedIn', 'Calendario de contenidos y publicaciones', 'Diseño de posts, reels y stories', 'Informes de resultados y crecimiento'],
-    icon: <Share2 className="w-8 h-8" />,
-    color: 'bg-slate-100',
-    bgColor: 'bg-slate-100',
-    textColor: 'text-ink',
-  },
-]
+   Ahora: rejilla. Los siete servicios se ven a la vez, se
+   escanean en segundos y cada uno abre WhatsApp con el servicio
+   ya mencionado en el mensaje, así sabéis de qué viene el lead.
 
-const ServiceCard: React.FC<{ service: ServiceData; index: number }> = ({ service, index }) => {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: cardRef,
-    offset: ['start end', 'start start'],
-  })
+   La lista sale de config/services.ts — no se define aquí, para
+   que hero, footer y esta sección no vuelvan a discrepar.
+   ============================================================ */
 
-  const scale = useTransform(scrollYProgress, [0, 1], [0.9, 1])
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [0.5, 1])
+const ServiceCard: React.FC<{ service: Service; index: number; inView: boolean }> = ({
+  service,
+  index,
+  inView,
+}) => {
+  const Icon = service.icon
 
   return (
-    <div
-      ref={cardRef}
-      className="sticky top-0 h-screen w-full flex items-center justify-center"
-      style={{ zIndex: index + 1 }}
+    <motion.article
+      initial={{ opacity: 0, y: 30 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, delay: Math.min(index * 0.08, 0.4) }}
+      className={`group relative flex flex-col rounded-3xl p-8 border transition-all duration-300 hover:-translate-y-1 ${
+        service.featured
+          ? 'bg-white border-brand-200 shadow-lg shadow-brand-900/5 hover:shadow-xl hover:shadow-brand-900/10'
+          : 'bg-slate-50 border-slate-100 hover:border-brand-200 hover:bg-white'
+      }`}
     >
-      <motion.div
-        style={{ scale, opacity }}
-        className={`w-full h-full ${service.bgColor} ${service.textColor} flex flex-col justify-center px-6 md:px-16 lg:px-24 relative overflow-hidden shadow-2xl`}
-      >
-        {/* Background number */}
-        <div className="absolute top-8 right-8 md:top-16 md:right-16 text-[12rem] md:text-[20rem] font-display font-bold opacity-[0.03] leading-none select-none pointer-events-none">
+      {service.featured && (
+        <span className="absolute -top-3 left-8 px-3 py-1 rounded-full bg-brand-600 text-white text-[0.65rem] font-semibold tracking-widest uppercase">
+          Lo que más nos piden
+        </span>
+      )}
+
+      <div className="flex items-center justify-between mb-6">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-50 text-brand-600 border border-brand-100">
+          <Icon className="w-7 h-7" />
+        </div>
+        <span className="text-4xl font-display font-bold text-slate-100 select-none">
           {service.number}
-        </div>
+        </span>
+      </div>
 
-        <div className="max-w-7xl mx-auto w-full relative z-10">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-12">
-            <div className="lg:w-1/2">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-sm font-semibold tracking-widest uppercase opacity-50">
-                  Servicio {service.number} / {String(services.length).padStart(2, '0')}
-                </span>
-              </div>
+      <h3 className="text-2xl font-display font-bold text-ink mb-1 leading-tight">
+        {service.title}
+      </h3>
+      <p className="text-brand-600 text-sm font-medium mb-4">{service.subtitle}</p>
 
-              <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-8 ${
-                service.id === 'redes' || service.id === 'datos' ? 'bg-white/10' : 'bg-brand-100'
-              }`}>
-                <div className={service.id === 'redes' || service.id === 'datos' ? 'text-white' : 'text-brand-600'}>
-                  {service.icon}
-                </div>
-              </div>
+      <p className="text-muted leading-relaxed mb-6">{service.description}</p>
 
-              <h3 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight mb-4 leading-tight">
-                {service.title}
-              </h3>
-              <p className={`text-xl md:text-2xl font-light mb-8 ${
-                service.id === 'redes' || service.id === 'datos' ? 'text-slate-300' : 'text-muted'
-              }`}>
-                {service.subtitle}
-              </p>
-            </div>
+      <ul className="space-y-2.5 mb-8">
+        {service.details.map((detail) => (
+          <li key={detail} className="flex items-start gap-3 text-sm text-muted">
+            <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-400 shrink-0" />
+            <span>{detail}</span>
+          </li>
+        ))}
+      </ul>
 
-            <div className="lg:w-2/5 lg:pt-24">
-              <p className={`text-lg leading-relaxed mb-10 ${
-                service.id === 'redes' || service.id === 'datos' ? 'text-slate-300' : 'text-muted'
-              }`}>
-                {service.description}
-              </p>
-
-              <ul className="space-y-4 mb-10">
-                {service.details.map((detail, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                      service.id === 'redes' || service.id === 'datos' ? 'bg-brand-400' : 'bg-brand-600'
-                    }`} />
-                    <span className={service.id === 'redes' || service.id === 'datos' ? 'text-slate-300' : 'text-muted'}>
-                      {detail}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <a
-                href="#contacto"
-                className={`inline-flex items-center gap-2 font-semibold transition-all duration-300 group ${
-                  service.id === 'redes' || service.id === 'datos'
-                    ? 'text-white hover:text-brand-300'
-                    : 'text-brand-600 hover:text-brand-800'
-                }`}
-              >
-                Solicitar información
-                <ArrowUpRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    </div>
+      {/* mt-auto: los botones quedan alineados aunque las tarjetas
+          tengan distinta cantidad de texto.
+          min-h-[44px]: antes era un enlace de texto de 24px de alto,
+          incómodo de acertar con el dedo. 44px es el mínimo cómodo. */}
+      <a
+        href={whatsappHref(waMessages.service(service.title))}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-auto inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-2.5 rounded-xl border border-brand-200 bg-white font-semibold text-brand-600 hover:bg-brand-600 hover:border-brand-600 hover:text-white transition-colors"
+      >
+        <WhatsAppIcon className="w-4 h-4 shrink-0" />
+        Me interesa
+        <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+      </a>
+    </motion.article>
   )
 }
 
 const Services: React.FC = () => {
-  return (
-    <section id="servicios" className="relative">
-      <div className="bg-white py-20 px-6 text-center">
-        <span className="text-sm font-semibold tracking-widest uppercase text-muted mb-4 block">
-          Qué hacemos
-        </span>
-        <h2 className="text-4xl md:text-5xl font-display font-bold tracking-tight text-ink max-w-3xl mx-auto">
-          Seis formas de hacer crecer tu negocio
-        </h2>
-      </div>
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-80px' })
 
-      <div className="relative">
-        {services.map((service, index) => (
-          <ServiceCard key={service.id} service={service} index={index} />
-        ))}
+  return (
+    <section id="servicios" ref={ref} className="py-24 md:py-32 bg-white">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <span className="text-sm font-semibold tracking-widest uppercase text-muted mb-4 block">
+            Qué hacemos
+          </span>
+          <h2 className="text-4xl md:text-5xl font-display font-bold tracking-tight text-ink max-w-3xl mx-auto text-balance">
+            Siete formas de quitarte trabajo de encima
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {services.map((service, index) => (
+            <ServiceCard key={service.id} service={service} index={index} inView={inView} />
+          ))}
+        </div>
       </div>
     </section>
   )

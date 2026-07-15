@@ -1,0 +1,64 @@
+name: Desplegar a GitHub Pages
+
+# Hasta ahora el despliegue era manual: alguien compilaba en su
+# equipo y subía el resultado a la rama gh-pages. Por eso lo que
+# había publicado era un build del 13 de mayo, con el formulario
+# roto, mientras el código de master ya iba por otro lado.
+#
+# Con esto, cada push a master compila y publica solo. Lo que está
+# en producción pasa a ser siempre lo que está en master.
+
+on:
+  push:
+    branches: [master]
+  # Permite lanzar un despliegue a mano desde la pestaña Actions
+  workflow_dispatch:
+
+# Permisos que necesita el despliegue oficial de Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Si se empujan dos commits seguidos, cancela el despliegue viejo
+# en vez de encadenarlos: siempre gana el último.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # `npm ci` en vez de `npm install`: instala exactamente lo que
+      # dice package-lock.json, así el build es reproducible.
+      - name: Instalar dependencias
+        run: npm ci
+
+      # `npm run build` ejecuta `tsc && vite build`: si hay un error
+      # de tipos, el despliegue falla aquí y no llega a producción.
+      - name: Compilar
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
