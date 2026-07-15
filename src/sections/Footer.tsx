@@ -19,6 +19,12 @@ const companyLinks = [
   { label: 'Contacto', href: '#contacto' },
 ]
 
+const legalLinks = [
+  { label: 'Aviso legal', href: '#/aviso-legal' },
+  { label: 'Política de privacidad', href: '#/privacidad' },
+  { label: 'Política de cookies', href: '#/cookies' },
+]
+
 const Footer: React.FC = () => {
   return (
     <footer className="bg-ink text-white py-16 md:py-20">
@@ -123,6 +129,20 @@ const Footer: React.FC = () => {
           <p className="text-slate-500 text-sm">
             © {new Date().getFullYear()} {site.name}. Todos los derechos reservados.
           </p>
+          {/* Antes estos enlaces apuntaban a href="#" y no llevaban a
+              ninguna parte. Ahora existen los documentos y la LSSI
+              exige que sean accesibles desde cualquier página. */}
+          <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+            {legalLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-slate-500 hover:text-white text-sm transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>
