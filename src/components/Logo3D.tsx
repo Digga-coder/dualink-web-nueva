@@ -1,69 +1,37 @@
-import { useRef, useMemo, useEffect, memo, type MutableRefObject } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Environment, ContactShadows, AdaptiveDpr, PerformanceMonitor } from '@react-three/drei'
+import { useRef, useMemo, useEffect, memo } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { Environment, Lightformer, ContactShadows, AdaptiveDpr } from '@react-three/drei'
 import * as THREE from 'three'
+import type { Quality } from '../lib/quality'
 
 /* ============================================================
-   DUALINK · CLIP 3D — render fotorrealista + cámara cinemática
+   DUALINK · CLIP 3D — decorativo
    ------------------------------------------------------------
-   RENDIMIENTO (puntos clave de esta versión):
+   CAMBIOS FRENTE A LA VERSIÓN ANTERIOR:
 
-   1. Desacople de eventos nativos: el scroll NO mueve la cámara
-      directamente. El Hero sólo escribe un "target value" en
-      `sceneStateRef`. La cámara persigue ese target mediante
-      lerp dentro de useFrame (= requestAnimationFrame de R3F).
-   2. El árbol del Canvas NO se vuelve a renderizar al hacer
-      scroll: la escena lee de un ref mutable, no de props.
-   3. Estrategia adaptativa (LOD): `quality` reduce geometría,
-      sombras y reflejos en hardware móvil / de gama baja.
-   4. Culling: el Canvas pausa el bucle de render (frameloop
-      'never') cuando el Hero sale del viewport.
-   5. PerformanceMonitor + AdaptiveDpr bajan la resolución de
-      render si los FPS caen por debajo del umbral.
+   1. Ya no depende del scroll. Antes la cámara viajaba entre 7
+      "tomas" empujada por un hero de 765vh, y las tarjetas de
+      servicio sólo se mostraban cuando la cámara aterrizaba —
+      cosa que no ocurre si el visitante scrollea seguido. El
+      scrollytelling se ha eliminado: esto es un adorno de fondo
+      y se comporta como tal.
+
+   2. Sin descargas externas. `<Environment preset="studio" />`
+      se bajaba un HDRI de varios MB desde un CDN de terceros en
+      CADA carga, y hasta que llegaba el metal se veía negro.
+      Ahora el mapa de entorno se genera en GPU con Lightformers:
+      cero red, mismo acabado.
+
+   3. Carga diferida. Este módulo arrastra three.js (~1 MB sin
+      comprimir). Ahora se importa con React.lazy desde el Hero,
+      así que el titular, el texto y el botón de WhatsApp se
+      pintan y funcionan SIN esperar al 3D, que llega después.
+      `detectQuality` vive en lib/quality.ts justo por esto.
+
+   SE MANTIENE lo que estaba bien hecho: LOD por gama de
+   dispositivo, culling del bucle de render fuera del viewport y
+   DPR adaptativo.
    ============================================================ */
-
-export type SceneState = {
-  activeIndex: number
-  inIntro: boolean
-  autoPlay: boolean
-}
-
-export type Quality = 'high' | 'low'
-
-/* Detección de gama de dispositivo (una sola vez en el cliente) */
-export function detectQuality(): Quality {
-  if (typeof window === 'undefined') return 'high'
-  try {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'low'
-    const coarse = window.matchMedia('(pointer: coarse)').matches
-    const narrow = window.matchMedia('(max-width: 820px)').matches
-    const cores = navigator.hardwareConcurrency ?? 8
-    const mem = (navigator as unknown as { deviceMemory?: number }).deviceMemory ?? 8
-    if (coarse && narrow) return 'low'
-    if (cores <= 4 || mem <= 4) return 'low'
-  } catch {
-    /* matchMedia no disponible: asumimos gama alta */
-  }
-  return 'high'
-}
-
-type Shot = {
-  pos: [number, number, number]
-  target: [number, number, number]
-}
-
-const INTRO_SHOT: Shot = { pos: [2.6, 1.8, 7.6], target: [0, 0, 0] }
-
-/* Una toma de cámara por servicio (foco sobre una cara del clip) */
-const SHOTS: Shot[] = [
-  { pos: [2.4, 1.5, 4.6], target: [0, 0.6, 0] },
-  { pos: [4.3, -1.0, 3.1], target: [0, -0.6, 0] },
-  { pos: [-1.5, 0.25, 3.3], target: [0, 0, 0] },
-  { pos: [-3.9, 1.6, 3.6], target: [0, 0.6, 0] },
-  { pos: [0.6, 3.3, 4.3], target: [0, 1.1, 0] },
-  { pos: [-3.0, -2.4, 3.8], target: [0, -0.7, 0] },
-  { pos: [-2.6, -1.6, 4.2], target: [-0.1, -0.2, 0] },
-]
 
 /* ----- Nivel de detalle (LOD) por gama de dispositivo -----
    La carga geométrica del tubo es el principal coste de VRAM:
@@ -135,8 +103,8 @@ function LinkMaterial({ quality, variant }: { quality: Quality; variant: 'blue' 
 }
 
 /* El clip completo: dos eslabones entrelazados (geometría
-   compartida entre ambos para no duplicar VRAM). El modelo NO
-   rota; sólo flota de forma casi imperceptible. */
+   compartida entre ambos para no duplicar VRAM). Rotación lenta
+   y flotación casi imperceptible. */
 function Clip({ quality }: { quality: Quality }) {
   const groupRef = useRef<THREE.Group>(null)
   const seg = LOD[quality]
@@ -151,20 +119,18 @@ function Clip({ quality }: { quality: Quality }) {
   useEffect(() => () => geometry.dispose(), [geometry])
 
   const floatAmp = quality === 'high' ? 0.04 : 0.02
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const g = groupRef.current
     if (!g) return
+    /* `delta` se acota para evitar un salto brusco al reanudar
+       el bucle tras el culling. */
+    g.rotation.y += Math.min(delta, 0.05) * 0.18
     g.position.y = Math.sin(state.clock.elapsedTime * 0.5) * floatAmp
   })
 
   return (
     <group ref={groupRef}>
-      <mesh
-        geometry={geometry}
-        position={[0, 0.6, 0]}
-        castShadow={shadows}
-        receiveShadow={shadows}
-      >
+      <mesh geometry={geometry} position={[0, 0.6, 0]} castShadow={shadows} receiveShadow={shadows}>
         <LinkMaterial quality={quality} variant="blue" />
       </mesh>
       <mesh
@@ -180,67 +146,20 @@ function Clip({ quality }: { quality: Quality }) {
   )
 }
 
-/* ----- Plataforma de cámara -----
-   Lee el "target value" desde `stateRef` (mutado por el Hero) y
-   persigue la toma correspondiente con interpolación lineal.
-   No depende de props de React => el scroll no re-renderiza. */
-function CameraRig({
-  stateRef,
-  onShotSettled,
-}: {
-  stateRef: MutableRefObject<SceneState>
-  onShotSettled?: (index: number) => void
-}) {
-  const { camera } = useThree()
-  const targetPos = useMemo(() => new THREE.Vector3(), [])
-  const targetLook = useMemo(() => new THREE.Vector3(), [])
-  const currentLook = useRef(new THREE.Vector3(0, 0, 0))
-  const settledRef = useRef(false)
-  const prevKey = useRef('')
-
-  useFrame((_, delta) => {
-    const s = stateRef.current
-
-    /* Al cambiar de toma, la cámara vuelve a estar "en tránsito" */
-    const key = s.inIntro ? 'intro' : `svc-${s.activeIndex}`
-    if (key !== prevKey.current) {
-      prevKey.current = key
-      settledRef.current = false
-    }
-
-    const shot = s.inIntro ? INTRO_SHOT : SHOTS[s.activeIndex] ?? SHOTS[0]
-    targetPos.set(shot.pos[0], shot.pos[1], shot.pos[2])
-    targetLook.set(shot.target[0], shot.target[1], shot.target[2])
-
-    /* Suavizado independiente del framerate. `delta` se acota
-       para evitar saltos al reanudar el bucle tras el culling. */
-    const d = Math.min(delta, 0.05)
-    const smooth = s.autoPlay ? 0.0022 : 0.0042
-    const lerp = 1 - Math.pow(smooth, d)
-
-    camera.position.lerp(targetPos, lerp)
-    currentLook.current.lerp(targetLook, lerp)
-    camera.lookAt(currentLook.current)
-
-    /* Detección de llegada: dispara la UI contextual una sola vez */
-    if (!settledRef.current && camera.position.distanceTo(targetPos) < 0.07) {
-      settledRef.current = true
-      if (!s.inIntro) onShotSettled?.(s.activeIndex)
-    }
-  })
-
-  return null
+/* Mapa de entorno generado en GPU: sustituye al HDRI remoto.
+   Tres focos rectangulares bastan para que el metal tenga
+   reflejos creíbles. */
+function StudioEnv({ quality }: { quality: Quality }) {
+  return (
+    <Environment resolution={quality === 'high' ? 256 : 128}>
+      <Lightformer intensity={2.6} position={[0, 4, 3]} scale={[8, 3, 1]} color="#ffffff" />
+      <Lightformer intensity={1.4} position={[-4, 1, 2]} scale={[4, 6, 1]} color="#9db8ff" />
+      <Lightformer intensity={1.1} position={[4, -2, 2]} scale={[4, 4, 1]} color="#3b82f6" />
+    </Environment>
+  )
 }
 
-function Scene({
-  quality,
-  stateRef,
-  onShotSettled,
-}: {
-  quality: Quality
-  stateRef: MutableRefObject<SceneState>
-  onShotSettled?: (index: number) => void
-}) {
+function Scene({ quality }: { quality: Quality }) {
   const shadows = quality === 'high'
 
   return (
@@ -248,12 +167,9 @@ function Scene({
       <ambientLight intensity={0.45} />
       <directionalLight position={[6, 8, 6]} intensity={2.6} castShadow={shadows} />
       <directionalLight position={[-6, 3, -5]} intensity={1} color="#7aa2ff" />
-      <directionalLight position={[3, -4, 3]} intensity={0.7} color="#1e40af" />
       <pointLight position={[0, -2, 6]} intensity={0.9} color="#3b82f6" />
 
       <Clip quality={quality} />
-
-      <CameraRig stateRef={stateRef} onShotSettled={onShotSettled} />
 
       {/* Sombra de contacto horneada una sola vez (frames=1):
           deja de recalcularse cada frame => gran ahorro de GPU. */}
@@ -267,21 +183,17 @@ function Scene({
         resolution={shadows ? 512 : 256}
       />
 
-      <Environment preset="studio" />
+      <StudioEnv quality={quality} />
     </>
   )
 }
 
 const Logo3D = memo(function Logo3D({
-  stateRef,
   quality,
   visible,
-  onShotSettled,
 }: {
-  stateRef: MutableRefObject<SceneState>
   quality: Quality
   visible: boolean
-  onShotSettled?: (index: number) => void
 }) {
   const maxDpr = quality === 'high' ? 2 : 1.3
 
@@ -292,7 +204,7 @@ const Logo3D = memo(function Logo3D({
       dpr={[1, maxDpr]}
       /* CULLING: pausa total del bucle WebGL fuera del viewport */
       frameloop={visible ? 'always' : 'never'}
-      camera={{ position: INTRO_SHOT.pos, fov: 38 }}
+      camera={{ position: [2.6, 1.4, 6.2], fov: 38 }}
       gl={{
         antialias: quality === 'high',
         alpha: true,
@@ -301,10 +213,8 @@ const Logo3D = memo(function Logo3D({
       }}
       style={{ background: 'transparent' }}
     >
-      {/* Monitoriza FPS y degrada calidad si caen bajo el umbral */}
-      <PerformanceMonitor />
       <AdaptiveDpr pixelated />
-      <Scene quality={quality} stateRef={stateRef} onShotSettled={onShotSettled} />
+      <Scene quality={quality} />
     </Canvas>
   )
 })
