@@ -1,5 +1,6 @@
 import { ArrowLeft, AlertTriangle } from 'lucide-react'
 import { legal, legalIncompleto } from '../config/legal'
+import { contact } from '../config/site'
 
 /* Marco común de los textos legales: cabecera, botón de vuelta y
    tipografía legible. Se mantiene aparte de las secciones de
@@ -25,20 +26,23 @@ const LegalLayout: React.FC<{ titulo: string; children: React.ReactNode }> = ({
         Última actualización: {legal.ultimaActualizacion}
       </p>
 
-      {/* Aviso en pantalla mientras falten los datos fiscales.
+      {/* Aviso mientras falten los datos fiscales.
           Es deliberado que se vea: un aviso legal incompleto no
-          cumple la LSSI, y esconderlo sólo haría que se olvidara. */}
+          cumple la LSSI, y esconderlo sólo haría que se olvidara.
+          El texto va dirigido al visitante, no al desarrollador:
+          para completarlo, rellena src/config/legal.ts y este
+          bloque desaparece solo. */}
       {legalIncompleto() && (
         <div className="flex gap-3 p-5 mb-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900">
           <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
           <div className="text-sm leading-relaxed">
-            <strong className="font-semibold">Documento pendiente de completar.</strong>{' '}
-            Faltan los datos fiscales de la empresa (denominación social, NIF,
-            domicilio y datos registrales). Hasta rellenarlos en{' '}
-            <code className="px-1 py-0.5 rounded bg-amber-100 font-mono text-xs">
-              src/config/legal.ts
-            </code>{' '}
-            este texto no cumple el artículo 10 de la LSSI-CE.
+            <strong className="font-semibold">Documento en revisión.</strong> Estamos
+            actualizando los datos registrales de esta página. Si necesitas
+            cualquiera de ellos ahora mismo, escríbenos a{' '}
+            <a href={`mailto:${contact.email}`} className="font-semibold underline">
+              {contact.email}
+            </a>{' '}
+            y te los facilitamos.
           </div>
         </div>
       )}
