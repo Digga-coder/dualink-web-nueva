@@ -1,5 +1,6 @@
 import Navigation from './sections/Navigation'
 import Hero from './sections/Hero'
+import Agente from './sections/Agente'
 import Cases from './sections/Cases'
 import Services from './sections/Services'
 import Process from './sections/Process'
@@ -37,6 +38,7 @@ function Home() {
     <>
       <Navigation />
       <Hero />
+      <Agente />
       <Cases />
       <Services />
       <Process />

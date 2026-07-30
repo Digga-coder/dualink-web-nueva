@@ -82,6 +82,27 @@
     );
   }
 
+  /* ---- Turno de conversación ----
+     REGLA: el mensaje se ve por defecto. Sólo se esconde cuando
+     el propio JavaScript ha confirmado que va a reproducirlo,
+     añadiendo `hilo-armado` al hilo.
+
+     Está así a propósito. Al revés — esconder por CSS y confiar
+     en que algo lo enseñe — cualquier fallo del observador, un
+     navegador viejo o un bloqueador dejan al visitante mirando
+     una conversación vacía. Y la conversación ES el argumento
+     de venta de esta web. */
+  .hilo-armado .turno {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 340ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 340ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hilo-armado .turno-visible {
+    opacity: 1;
+    transform: none;
+  }
+
   /* ---- Calle pintada ----
      Marca el recorrido de lectura. Se dibuja una vez al entrar
      y se queda quieta. */

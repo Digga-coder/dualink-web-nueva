@@ -18,7 +18,8 @@ import Marca from '../components/Marca'
    ============================================================ */
 
 const links = [
-  { label: 'Funcionando', href: '#funcionando' },
+  { label: 'Verlo funcionar', href: '#agente' },
+  { label: 'Clientes', href: '#funcionando' },
   { label: 'Qué instalamos', href: '#servicios' },
   { label: 'Cómo se paga', href: '#pago' },
   { label: 'Contacto', href: '#contacto' },

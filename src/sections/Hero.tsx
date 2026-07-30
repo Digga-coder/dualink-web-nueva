@@ -62,10 +62,10 @@ const Hero: React.FC = () => (
               Cuéntanos tu problema
             </a>
             <a
-              href="#funcionando"
+              href="#agente"
               className="engraved inline-flex items-center justify-center gap-3 min-h-[56px] px-8 py-4 border-2 border-ink-400 text-ink-800 text-sm font-black hover:border-brand-700 hover:text-brand-700 transition-colors"
             >
-              Ver qué hay funcionando
+              Ver una atendiendo
               <ArrowDown className="w-4 h-4 shrink-0" />
             </a>
           </div>
