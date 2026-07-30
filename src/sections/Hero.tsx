@@ -1,178 +1,122 @@
-import { useRef, useState, useEffect, useMemo, lazy, Suspense } from 'react'
-import { motion } from 'framer-motion'
-import { ChevronDown, ArrowRight } from 'lucide-react'
-import { detectQuality } from '../lib/quality'
+import { ArrowDown } from 'lucide-react'
 import WhatsAppIcon from '../components/WhatsAppIcon'
 import { whatsappHref, waMessages } from '../config/site'
 
-/* El clip 3D arrastra three.js (~1 MB). Cargándolo aparte, el
-   mensaje y el botón de WhatsApp se pintan de inmediato y el
-   adorno llega cuando llega. Si nunca llegase, la web sigue
-   siendo perfectamente usable. */
-const Logo3D = lazy(() => import('../components/Logo3D'))
-
 /* ============================================================
-   DUALINK HERO
+   DUALINK · BAHÍA DE ENTRADA
    ------------------------------------------------------------
-   Este hero medía 765vh (100 + 7 servicios × 95vh) y secuestraba
-   el scroll: había que atravesar casi 8 pantallas de logo 3D
-   antes de llegar a nada vendible, y las tarjetas de servicio
-   sólo aparecían cuando la cámara "aterrizaba", cosa que no
-   ocurre si el visitante scrollea seguido. La mayoría no llegaba
-   a leer un solo servicio.
+   Lo que se ha quitado y por qué:
 
-   Ahora ocupa UNA pantalla: propuesta, prueba y llamada a la
-   acción visibles sin scrollear. El 3D se queda como fondo
-   decorativo — que es lo que aporta — pero ya no bloquea la venta.
+   1. El clip 3D del logo. Arrastraba three.js + fiber + drei —
+      cerca de 1 MB — para poner una figura girando de adorno
+      detrás del texto, y encima había que taparlo con un velo
+      blanco para que el titular se leyera. Un adorno que hay
+      que tapar no es un adorno: es un obstáculo. Fuera, y con
+      él tres dependencias enteras.
+
+   2. El antetítulo ("AGENTES DE IA · AUTOMATIZACIÓN · SOFTWARE
+      A MEDIDA" en mayúsculas dentro de una píldora de cristal).
+      Había uno encima de CADA titular de la web — siete en
+      total. El titular se sostiene solo.
+
+   Lo que entra: la placa del 30%. Es el argumento más fuerte
+   del discurso comercial y estaba enterrado a dos tercios de
+   la página. Ahora se ve sin scrollear, que es donde se decide
+   si esta gente es de fiar.
    ============================================================ */
 
-const Hero: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(true)
+const Hero: React.FC = () => (
+  <section
+    id="inicio"
+    className="relative min-h-[100svh] flex items-center bg-paper-50 overflow-hidden pt-24 pb-16"
+  >
+    {/* Calle pintada: entra por el borde izquierdo y marca la
+        altura del titular. Se dibuja una vez y se queda. */}
+    <div
+      aria-hidden="true"
+      className="absolute left-0 top-[38%] h-1.5 w-[42vw] bg-brand-700 lane lane-draw"
+    />
 
-  /* Gama del dispositivo: se calcula una sola vez */
-  const quality = useMemo(() => detectQuality(), [])
+    <div className="relative z-10 w-full max-w-[92rem] mx-auto px-5 sm:px-8">
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_20rem] gap-12 lg:gap-16 items-end">
+        <div>
+          <h1 className="plate-type font-black text-ink-900 text-[2.6rem] sm:text-6xl lg:text-[4.25rem] leading-[0.95] max-w-[16ch]">
+            El trabajo que te come el día lo puede hacer una máquina
+          </h1>
 
-  /* Culling: pausa el bucle WebGL cuando el hero sale de pantalla */
-  useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => setVisible(entry.isIntersecting),
-      { threshold: 0 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
+          <p className="mt-8 text-lg sm:text-xl text-ink-700 leading-relaxed max-w-[52ch]">
+            Montamos agentes que atienden a tus clientes por WhatsApp,
+            programas que sustituyen tus hojas de cálculo y automatismos que
+            hacen solos lo que hoy haces a mano. Te lo explicamos sin
+            tecnicismos y lo ves funcionando antes de pagarlo entero.
+          </p>
 
-  return (
-    <section
-      id="inicio"
-      ref={containerRef}
-      className="relative min-h-[100svh] flex items-center overflow-hidden bg-gradient-to-b from-white via-paper to-slate-100"
-    >
-      {/* Halo decorativo */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[700px] max-h-[700px] rounded-full bg-brand-100/40 blur-3xl pointer-events-none" />
-
-      {/* ===== CLIP 3D — decorativo =====
-          Oculto en móvil: allí gasta batería, tapa el texto y el
-          mensaje importa más que el adorno. */}
-      <div className="absolute inset-0 z-0 hidden md:block pointer-events-none" aria-hidden="true">
-        <Suspense fallback={null}>
-          <Logo3D quality={quality} visible={visible} />
-        </Suspense>
-      </div>
-
-      {/* Velo de contraste: garantiza que el texto se lea por
-          encima del clip 3D oscuro */}
-      <div
-        className="absolute inset-0 z-[1] pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse 90% 70% at 28% 50%, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.86) 45%, rgba(255,255,255,0) 80%)',
-        }}
-      />
-
-      {/* ===== CONTENIDO ===== */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-28 pb-24">
-        <div className="max-w-3xl">
-          <motion.span
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="inline-block px-4 py-1.5 mb-6 rounded-full bg-white/80 backdrop-blur-md border border-slate-200 text-muted text-xs font-semibold tracking-widest uppercase"
-          >
-            Agentes de IA · Automatización · Software a medida
-          </motion.span>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1, ease: 'easeOut' }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold tracking-tight text-ink mb-6 leading-[1.08] text-balance"
-          >
-            Agentes de <span className="text-brand-600">IA</span> que atienden a
-            tus clientes mientras tú haces tu trabajo
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
-            className="text-base sm:text-lg md:text-xl text-muted max-w-2xl font-light leading-relaxed mb-10"
-          >
-            Automatizamos lo que te hace perder el día: atender consultas,
-            filtrar contactos, tomar pedidos y agendar citas. Te lo explicamos
-            sin tecnicismos y lo ves funcionando antes de pagarlo entero.
-          </motion.p>
-
-          {/* ===== LLAMADAS A LA ACCIÓN ===== */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3, ease: 'easeOut' }}
-            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4"
-          >
+          <div className="mt-10 flex flex-col sm:flex-row gap-3">
             <a
               href={whatsappHref(waMessages.general)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-[#25D366] text-white font-semibold rounded-xl hover:bg-[#1eb855] transition-all duration-300 shadow-lg shadow-[#25D366]/25 hover:shadow-xl hover:shadow-[#25D366]/30 hover:-translate-y-0.5"
+              className="engraved inline-flex items-center justify-center gap-3 min-h-[56px] px-8 py-4 bg-brand-700 text-white text-sm font-black hover:bg-brand-800 transition-colors shadow-plate"
             >
               <WhatsAppIcon className="w-5 h-5 shrink-0" />
-              Hablar por WhatsApp
+              Cuéntanos tu problema
             </a>
             <a
-              href="#resultados"
-              className="group inline-flex items-center justify-center gap-2 px-7 py-4 bg-white/80 backdrop-blur-md text-ink font-semibold rounded-xl border border-slate-200 hover:border-brand-300 hover:bg-white transition-all duration-300"
+              href="#funcionando"
+              className="engraved inline-flex items-center justify-center gap-3 min-h-[56px] px-8 py-4 border-2 border-ink-400 text-ink-800 text-sm font-black hover:border-brand-700 hover:text-brand-700 transition-colors"
             >
-              Ver casos reales
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+              Ver qué hay funcionando
+              <ArrowDown className="w-4 h-4 shrink-0" />
             </a>
-          </motion.div>
+          </div>
 
-          {/* ===== BARRA DE CONFIANZA ===== */}
-          <motion.ul
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.7, delay: 0.5 }}
-            className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-10 text-sm text-muted"
-          >
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />
-              Agentes funcionando 24/7 en producción
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />
-              Pagas por fases, nunca todo por adelantado
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />
-              Tudela, Navarra
-            </li>
-          </motion.ul>
+          <ul className="mt-12 flex flex-wrap gap-x-8 gap-y-3">
+            {[
+              'Agentes en producción 24/7',
+              'Tudela, Navarra',
+              'Sin formularios: se habla y ya',
+            ].map((item) => (
+              <li
+                key={item}
+                className="flex items-center gap-2.5 text-sm font-semibold text-ink-700"
+              >
+                <span className="w-2 h-2 bg-brand-700 shrink-0" />
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
 
-      {/* ===== INDICADOR DE SCROLL ===== */}
-      <motion.a
-        href="#servicios"
-        aria-label="Ver servicios"
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 hidden sm:flex flex-col items-center gap-1 text-muted hover:text-brand-600 transition-colors"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 0.5 }}
-      >
-        <span className="text-xs font-medium tracking-widest uppercase">Qué hacemos</span>
-        <motion.span
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <ChevronDown className="w-5 h-5" />
-        </motion.span>
-      </motion.a>
-    </section>
-  )
-}
+        {/* ===== PLACA DE CARGA =====
+            Grabada como la chapa de capacidad de una estantería:
+            la cifra manda, la explicación va debajo en pequeño. */}
+        <aside className="bg-white border-2 border-ink-300 shadow-plate">
+          <div className="engraved text-xs font-bold text-white bg-brand-700 px-4 py-2">
+            Condición de pago
+          </div>
+          <div className="p-6">
+            <div className="flex items-baseline gap-2">
+              <span className="plate-type font-black text-6xl text-ink-900 tabular-nums">
+                30
+              </span>
+              <span className="plate-type font-black text-3xl text-brand-700">%</span>
+            </div>
+            <p className="mt-2 text-sm font-semibold text-ink-700 leading-snug">
+              sin cobrar hasta que
+              <br />
+              lo veas funcionando
+            </p>
+            <hr className="my-5 border-ink-300" />
+            <p className="text-sm text-ink-700 leading-relaxed">
+              Lo normal en el sector es cobrar el 100% antes de empezar.
+              Nosotros partimos el proyecto en fases y dejamos el tramo final
+              sin pagar.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+)
 
 export default Hero

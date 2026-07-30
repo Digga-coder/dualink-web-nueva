@@ -1,162 +1,124 @@
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
-import { MessageSquare, Pencil, Rocket, Handshake, ShieldCheck } from 'lucide-react'
 import { whatsappHref, waMessages } from '../config/site'
 import WhatsAppIcon from '../components/WhatsAppIcon'
 
 /* ============================================================
-   DUALINK · PROCESO
+   DUALINK · CÓMO SE PAGA Y CÓMO SE TRABAJA
    ------------------------------------------------------------
-   Dos arreglos aquí:
+   El 30% retenido deja de ser una caja al final de la sección
+   de proceso y pasa a ser el bloque de color de toda la web.
+   Es la única sección naranja a sangre, y va aquí a propósito:
+   después de haber visto las máquinas funcionando y antes de
+   pedir la conversación. Es el momento en que se responde a la
+   pregunta que este visitante se está haciendo de verdad —
+   "¿y si me la dan con queso?".
 
-   1. El paso 01 tenía caracteres chinos incrustados en mitad de
-      una frase ("no sé qué决策 tomar"). Estaba publicado así.
+   Los cuatro pasos van sobre una calle pintada, no en cuatro
+   tarjetas iguales. La secuencia importa (es lo que pasa, en
+   orden), pero no necesita cuatro números gigantes de adorno:
+   la calle ya dice que hay recorrido.
 
-   2. Se añade el bloque de pago por fases. Es el argumento más
-      fuerte del discurso de venta —"de normal las agencias
-      cobran todo por adelantado; nosotros dejamos un 30% sin
-      pagar para que lo veas antes"— y la web no lo contaba en
-      ninguna parte, aunque se dice en cada llamada.
+   Se conserva el arreglo de la versión anterior: el paso 01
+   tenía caracteres chinos incrustados en mitad de una frase.
    ============================================================ */
 
-const steps = [
+const pasos = [
   {
-    number: '01',
-    icon: MessageSquare,
-    title: 'Nos cuentas tu problema',
-    description:
-      'Una llamada o un café. Nos explicas qué te frustra de tu día a día: "pierdo tiempo en emails", "no sé qué decisión tomar", "mi web no vende"... Lo que sea.',
+    titulo: 'Nos cuentas tu problema',
+    texto:
+      'Una llamada o un café. Nos explicas qué te frustra del día a día: "pierdo el tiempo en emails", "no sé qué decisión tomar", "mi web no vende". Lo que sea.',
   },
   {
-    number: '02',
-    icon: Pencil,
-    title: 'Diseñamos la solución',
-    description:
-      'Te presentamos un plan claro: qué vamos a hacer, cuánto cuesta y cuándo lo tendrás. Sin letra pequeña. Sin sorpresas.',
+    titulo: 'Diseñamos la solución',
+    texto:
+      'Te presentamos un plan claro: qué vamos a hacer, cuánto cuesta y cuándo lo tendrás. Sin letra pequeña.',
   },
   {
-    number: '03',
-    icon: Rocket,
-    title: 'Construimos y lanzamos',
-    description:
-      'Nos ponemos manos a la obra. Te enseñamos avances para que veas cómo va tomando forma. Cuando todo está listo, lanzamos juntos.',
+    titulo: 'Construimos y lanzamos',
+    texto:
+      'Te enseñamos avances mientras va tomando forma. Cuando está listo, lo lanzamos juntos.',
   },
   {
-    number: '04',
-    icon: Handshake,
-    title: 'Te acompañamos después',
-    description:
-      'No te dejamos solo. Resolvemos dudas, hacemos ajustes y nos aseguramos de que saques el máximo partido a lo que hemos creado.',
+    titulo: 'Te acompañamos después',
+    texto:
+      'Resolvemos dudas y hacemos ajustes. No desaparecemos al entregar.',
   },
 ]
 
-const Process: React.FC = () => {
-  const ref = useRef<HTMLDivElement>(null)
-  const isInView = useInView(ref, { once: true, margin: '-100px' })
-
-  return (
-    <section id="proceso" ref={ref} className="py-24 md:py-32 bg-white relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="text-sm font-semibold tracking-widest uppercase text-muted mb-4 block">
-              Cómo trabajamos
-            </span>
-            <h2 className="text-4xl md:text-5xl font-display font-bold tracking-tight text-ink max-w-3xl mx-auto text-balance">
-              De la idea a la realidad en cuatro pasos
+const Process: React.FC = () => (
+  <section id="pago">
+    {/* ===== EL BLOQUE NARANJA ===== */}
+    <div className="bg-brand-700 text-white">
+      <div className="max-w-[92rem] mx-auto px-5 sm:px-8 py-20 md:py-28">
+        <div className="grid lg:grid-cols-[1fr_auto] gap-12 lg:gap-20 items-end">
+          <div>
+            <h2 className="plate-type font-black text-[2.75rem] sm:text-6xl lg:text-7xl leading-[0.92] max-w-[14ch]">
+              Pagas por fases. Nunca todo por adelantado.
             </h2>
-          </motion.div>
-        </div>
+            <p className="mt-8 text-lg sm:text-xl leading-relaxed max-w-[54ch]">
+              Lo normal en las agencias es cobrarte el 100% antes de empezar.
+              Nosotros partimos el proyecto en fases y dejamos alrededor de un
+              30% sin cobrar hasta el final, para que veas aquello por lo que
+              estás pagando antes de soltar el último euro. Preferimos que lo
+              veas funcionando a contártelo.
+            </p>
+            <a
+              href={whatsappHref(waMessages.budget)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="engraved mt-10 inline-flex items-center justify-center gap-3 min-h-[56px] px-8 py-4 bg-white text-brand-700 text-sm font-black hover:bg-brand-50 transition-colors"
+            >
+              <WhatsAppIcon className="w-5 h-5 shrink-0" />
+              Pedir presupuesto
+            </a>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          {steps.map((step, index) => {
-            const Icon = step.icon
-            return (
-              <motion.div
-                key={step.number}
-                initial={{ opacity: 0, y: 50 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: index * 0.15 }}
-                className="relative"
-              >
-                {/* Línea conectora */}
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-12 left-full w-full h-px bg-gradient-to-r from-slate-200 to-transparent" />
-                )}
-
-                <div className="mb-6 flex items-center justify-between">
-                  <div className="w-12 h-12 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600">
-                    <Icon className="w-6 h-6" />
-                  </div>
-                  <span className="text-5xl font-display font-bold text-slate-100 select-none">
-                    {step.number}
-                  </span>
-                </div>
-
-                <h3 className="text-xl font-semibold text-ink mb-3">{step.title}</h3>
-                <p className="text-muted leading-relaxed">{step.description}</p>
-              </motion.div>
-            )
-          })}
-        </div>
-
-        {/* ===== PAGO POR FASES ===== */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="rounded-3xl bg-ink text-white p-8 md:p-12 lg:p-16"
-        >
-          <div className="flex flex-col lg:flex-row lg:items-center gap-10">
-            <div className="lg:flex-1">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full bg-white/10 text-brand-300 text-xs font-semibold tracking-widest uppercase">
-                <ShieldCheck className="w-4 h-4" />
-                Sin riesgo para ti
-              </div>
-              <h3 className="text-3xl md:text-4xl font-display font-bold mb-5 leading-tight text-balance">
-                Pagas por fases.<br />
-                Nunca todo por adelantado.
-              </h3>
-              <p className="text-slate-300 leading-relaxed text-lg max-w-xl">
-                Lo normal en las agencias es cobrarte el 100% antes de empezar.
-                Nosotros dividimos el proyecto en fases y dejamos alrededor de un
-                30% sin cobrar hasta el final, para que puedas ver aquello por lo
-                que estás pagando antes de soltar el último euro. Preferimos que
-                lo veas funcionando a contártelo.
-              </p>
+          {/* Barra de fases: lo pagado macizo, el tramo retenido
+              rayado. Es la misma información que el texto, dicha
+              con el material del mundo. */}
+          <div className="w-full lg:w-72 shrink-0">
+            <div className="flex h-14 border-2 border-white">
+              <div className="w-[70%] bg-white" />
+              <div className="w-[30%] hazard-invert border-l-2 border-white" />
             </div>
-
-            <div className="lg:w-72 shrink-0">
-              <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
-                <div className="flex items-end justify-between mb-4">
-                  <span className="text-5xl font-display font-bold text-white">30%</span>
-                  <span className="text-sm text-slate-400 text-right leading-tight">
-                    sin pagar<br />hasta verlo
-                  </span>
-                </div>
-                <div className="h-2 rounded-full bg-white/10 overflow-hidden mb-6">
-                  <div className="h-full w-[70%] rounded-full bg-brand-400" />
-                </div>
-                <a
-                  href={whatsappHref(waMessages.budget)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#25D366] text-white font-semibold rounded-xl hover:bg-[#1eb855] transition-colors"
-                >
-                  <WhatsAppIcon className="w-4 h-4 shrink-0" />
-                  Pedir presupuesto
-                </a>
-              </div>
+            <div className="mt-3 flex justify-between engraved text-xs font-black">
+              <span>70% por fases</span>
+              <span>30% al verlo</span>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
-    </section>
-  )
-}
+    </div>
+
+    {/* ===== LOS CUATRO PASOS ===== */}
+    <div className="bg-paper-50 py-24 md:py-32">
+      <div className="max-w-[92rem] mx-auto px-5 sm:px-8">
+        <h3 className="plate-type font-black text-ink-900 text-3xl sm:text-4xl max-w-[20ch]">
+          De la primera llamada a la máquina puesta
+        </h3>
+
+        <ol className="mt-14 relative grid gap-10 md:grid-cols-4 md:gap-8">
+          {/* La calle que une los cuatro puntos */}
+          <div
+            aria-hidden="true"
+            className="hidden md:block absolute left-0 right-0 top-[7px] h-1 bg-ink-100"
+          />
+
+          {pasos.map((paso, i) => (
+            <li key={paso.titulo} className="relative">
+              <div
+                aria-hidden="true"
+                className={`w-4 h-4 mb-6 ${i === 0 ? 'bg-brand-700' : 'bg-ink-400'}`}
+              />
+              <h4 className="plate-type font-black text-xl text-ink-900">
+                {paso.titulo}
+              </h4>
+              <p className="mt-3 text-ink-600 leading-relaxed">{paso.texto}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+)
 
 export default Process

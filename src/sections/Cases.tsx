@@ -1,178 +1,180 @@
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
-import { TrendingUp, ArrowRight } from 'lucide-react'
+/* ============================================================
+   DUALINK · LO QUE HAY FUNCIONANDO
+   ------------------------------------------------------------
+   Esta sección sube de la cuarta posición a la segunda. Antes
+   el visitante tenía que atravesar una sección de valores
+   genéricos ("Claridad · Compromiso · Calidad") y siete
+   tarjetas de servicio antes de ver una sola prueba de que
+   esta gente ha hecho algo alguna vez.
 
-type CaseStudy = {
-  client: string
-  industry: string
-  tags?: string[]
-  challenge: string
-  solution: string
-  result: string
-  metric: string
-  metricLabel: string
+   Cambia también la forma. Eran cinco tarjetas idénticas con
+   la plantilla de métrica: cifra grande, etiqueta pequeña,
+   acento de color. Ahora son bahías de estantería rotuladas y
+   NO tienen todas el mismo tamaño: los dos agentes que están
+   atendiendo clientes ahora mismo ocupan bahía ancha, porque
+   son la prueba que vende. El resto va en bahía normal.
+
+   Thermocork lleva balizado amarillo-negro. Es el único que no
+   está entregado — está en desarrollo — y decirlo cuesta menos
+   que un cliente que se sienta engañado en la primera reunión.
+   ============================================================ */
+
+type Estado = 'produccion' | 'obra'
+
+type Caso = {
+  cliente: string
+  sector: string
+  ancha?: boolean
+  estado: Estado
+  problema: string
+  maquina: string
+  cifra: string
+  cifraPie: string
 }
 
-const cases: CaseStudy[] = [
+const casos: Caso[] = [
   {
-    client: 'JMV Logística',
-    industry: 'Logística y transporte',
-    challenge: 'Gestionaban inventario a mano con hojas de cálculo. Errores constantes, pérdida de tiempo y clientes insatisfechos.',
-    solution: 'Sistema de gestión centralizado con control de stock en tiempo real y alertas automáticas.',
-    result: 'Redujeron un 70% el tiempo de gestión y eliminaron errores de inventario.',
-    metric: '-70%',
-    metricLabel: 'Tiempo de gestión',
+    cliente: 'Smash Gorry',
+    sector: 'Hostelería',
+    ancha: true,
+    estado: 'produccion',
+    problema:
+      'Los pedidos llegaban por mensajes sueltos. Comandas confundidas, errores continuos y siempre alguien pendiente del móvil.',
+    maquina:
+      'Un agente en Telegram que entiende el pedido escrito como lo escribe el cliente, lo confirma y lo manda a cocina y a la base de datos sin que nadie toque nada.',
+    cifra: '24/7',
+    cifraPie: 'Pedidos atendidos sin intervención',
   },
   {
-    client: 'Frecuenzy',
-    industry: 'Hostelería y ocio nocturno',
-    tags: ['SaaS', 'Tiempo real', 'PWA', 'POS móvil'],
-    challenge: 'Gestionaban las comandas y los cobros de la barra sobre la marcha, sin control en tiempo real de las ventas ni del rendimiento de cada camarero.',
-    solution: 'SaaS de punto de venta (POS) en tiempo real: app móvil para los camareros con lógica de combinados, panel de administración con métricas de ventas y módulos de control de acceso y tickets.',
-    result: 'El equipo de sala cobra desde el móvil y la dirección ve las ventas al instante, con todo el local conectado en una sola app instalable.',
-    metric: 'Tiempo real',
-    metricLabel: 'Control de ventas y comandas',
+    cliente: 'Three Inmobiliaria',
+    sector: 'Inmobiliaria',
+    ancha: true,
+    estado: 'produccion',
+    problema:
+      'El equipo se iba las horas filtrando contactos, repitiendo las mismas respuestas sobre pisos y cuadrando visitas una a una.',
+    maquina:
+      'Un embudo en WhatsApp que pregunta, descarta a quien no encaja, resuelve las dudas de cada propiedad y agenda la presentación por Zoom él solo.',
+    cifra: 'Auto',
+    cifraPie: 'Al equipo solo le llega quien interesa',
   },
   {
-    client: 'Smash Gorry',
-    industry: 'Agente de IA · Hostelería',
-    tags: ['Inteligencia Artificial', 'Automatización', 'Integración de APIs'],
-    challenge: 'Recibían los pedidos por mensajes sueltos: confusiones en la comanda, errores frecuentes y alguien siempre pendiente del móvil.',
-    solution: 'Agente de IA conversacional en Telegram (Gemini) que entiende los pedidos en lenguaje natural, los confirma y los envía a cocina y a Firebase de forma automática.',
-    result: 'Los clientes piden a cualquier hora y la comanda llega a cocina sin intervención manual.',
-    metric: '24/7',
-    metricLabel: 'Pedidos atendidos por IA',
+    cliente: 'JMV Logística',
+    sector: 'Logística',
+    estado: 'produccion',
+    problema:
+      'Llevaban el inventario a mano en hojas de cálculo. Errores constantes y tiempo perdido.',
+    maquina:
+      'Sistema de gestión centralizado con el stock en tiempo real y avisos automáticos.',
+    cifra: '−70%',
+    cifraPie: 'Tiempo de gestión',
   },
   {
-    client: 'Three Inmobiliaria',
-    industry: 'Agente de IA · PropTech',
-    tags: ['PropTech', 'Inteligencia Artificial', 'Agentes Autónomos', 'NLP'],
-    challenge: 'El equipo dedicaba horas a filtrar contactos, responder las mismas dudas sobre propiedades y coordinar las presentaciones una a una.',
-    solution: 'Embudo agéntico en WhatsApp que cualifica cada lead, resuelve consultas sobre las propiedades y agenda las presentaciones por Zoom de forma autónoma.',
-    result: 'Cada lead se cualifica y se atiende al instante; al equipo solo llegan los contactos realmente interesados.',
-    metric: 'Auto',
-    metricLabel: 'Cualificación de leads',
+    cliente: 'Frecuenzy',
+    sector: 'Ocio nocturno',
+    estado: 'produccion',
+    problema:
+      'Cobraban en barra sobre la marcha, sin control de las ventas ni de lo que hacía cada camarero.',
+    maquina:
+      'TPV propio en el móvil de cada camarero, con lógica de combinados, panel de ventas en directo y control de acceso. App instalable.',
+    cifra: 'Directo',
+    cifraPie: 'La dirección ve la barra al instante',
   },
   {
-    client: 'Thermocork',
-    industry: 'Construcción y aislamiento ecológico',
-    tags: ['Transformación digital', 'Web premium', 'Agente RAG (IA)', 'Automatización'],
-    challenge: 'El crecimiento de la facturación estaba atado a la carga de trabajo manual de la dirección: el papeleo y las tareas repetitivas frenaban el escalado del negocio.',
-    solution: 'Plan Director de Transformación Digital 2026: web corporativa premium "Industrial Luxury" con galería de obras reales y zona B2B restringida, un Agente RAG que funciona como cerebro corporativo de consulta, un agente de inteligencia de reuniones y la automatización de pedidos omnicanal con trazabilidad.',
-    result: 'El objetivo: una empresa donde el material sea físico pero la gestión sea 100% digital, rápida y sin papeleo. Proyecto en desarrollo.',
-    metric: '100%',
-    metricLabel: 'Gestión digital, sin papeleo',
+    cliente: 'Thermocork',
+    sector: 'Construcción',
+    estado: 'obra',
+    problema:
+      'La facturación crecía atada al papeleo de la dirección: cada pedido y cada trámite frenaba el escalado.',
+    maquina:
+      'Plan Director 2026: web con zona B2B, un agente que responde consultas con la documentación de la empresa dentro, y pedidos automatizados con trazabilidad.',
+    cifra: '2026',
+    cifraPie: 'En desarrollo, todavía no entregado',
   },
 ]
 
-const Cases: React.FC = () => {
-  const ref = useRef<HTMLDivElement>(null)
-  const isInView = useInView(ref, { once: true, margin: '-100px' })
+const Bahia: React.FC<{ caso: Caso }> = ({ caso }) => {
+  const enObra = caso.estado === 'obra'
 
   return (
-    <section id="resultados" ref={ref} className="py-32 md:py-40 bg-slate-50 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="text-sm font-semibold tracking-widest uppercase text-muted mb-4 block">
-              Resultados reales
-            </span>
-            <h2 className="text-4xl md:text-5xl font-display font-bold tracking-tight text-ink">
-              Casos de éxito
-            </h2>
-          </motion.div>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-muted mt-4 md:mt-0 max-w-md"
-          >
-            Historias de clientes que dejaron de perder tiempo y empezaron a ganar eficiencia.
-          </motion.p>
-        </div>
+    <article
+      className={`relative bg-white border-2 border-ink-200 flex flex-col ${
+        caso.ancha ? 'lg:col-span-3' : 'lg:col-span-2'
+      }`}
+    >
+      {/* Rótulo de bahía */}
+      <div className="flex items-stretch border-b-2 border-ink-200">
+        <span className="engraved flex items-center px-4 py-2.5 text-xs font-bold bg-ink-100 text-ink-700">
+          {caso.sector}
+        </span>
+        <span className="engraved flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-ink-600">
+          {enObra ? (
+            <>
+              <span className="w-2 h-2 bg-ink-500 shrink-0" />
+              En obra
+            </>
+          ) : (
+            <>
+              <span className="w-2 h-2 bg-brand-700 shrink-0" />
+              Funcionando
+            </>
+          )}
+        </span>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {cases.map((item, index) => (
-            <motion.div
-              key={item.client}
-              initial={{ opacity: 0, y: 50 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, delay: 0.2 + index * 0.15 }}
-              className="group bg-white rounded-3xl p-8 md:p-12 border border-slate-100 hover:border-brand-200 transition-all duration-500 hover:shadow-xl hover:shadow-brand-900/5"
-            >
-              <div className="flex items-start justify-between mb-8">
-                <div>
-                  <span className="text-xs font-semibold tracking-widest uppercase text-muted block mb-2">
-                    {item.industry}
-                  </span>
-                  <h3 className="text-2xl md:text-3xl font-display font-bold text-ink">
-                    {item.client}
-                  </h3>
-                </div>
-                <div className="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap shrink-0">
-                  <TrendingUp className="w-4 h-4 shrink-0" />
-                  {item.metric}
-                </div>
-              </div>
+      <div className="p-6 sm:p-8 flex flex-col flex-1">
+        <h3
+          className={`plate-type font-black text-ink-900 ${
+            caso.ancha ? 'text-4xl sm:text-5xl' : 'text-3xl'
+          }`}
+        >
+          {caso.cliente}
+        </h3>
 
-              {item.tags && (
-                <div className="flex flex-wrap gap-2 mb-8">
-                  {item.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs font-medium px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+        <p className="mt-5 text-ink-600 leading-relaxed">{caso.problema}</p>
 
-              <div className="space-y-6 mb-10">
-                <div>
-                  <span className="text-xs font-semibold tracking-widest uppercase text-red-400 block mb-2">
-                    El problema
-                  </span>
-                  <p className="text-muted leading-relaxed">
-                    {item.challenge}
-                  </p>
-                </div>
-                <div className="flex items-center justify-center">
-                  <ArrowRight className="w-5 h-5 text-brand-300 rotate-90 md:rotate-0" />
-                </div>
-                <div>
-                  <span className="text-xs font-semibold tracking-widest uppercase text-brand-600 block mb-2">
-                    Nuestra solución
-                  </span>
-                  <p className="text-ink leading-relaxed">
-                    {item.solution}
-                  </p>
-                </div>
-              </div>
+        <p
+          className={`mt-5 text-ink-800 leading-relaxed ${
+            caso.ancha ? 'text-lg' : ''
+          }`}
+        >
+          {caso.maquina}
+        </p>
 
-              <div className="pt-8 border-t border-slate-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-4xl md:text-5xl font-display font-bold text-brand-600 block">
-                      {item.metric}
-                    </span>
-                    <span className="text-sm text-muted">{item.metricLabel}</span>
-                  </div>
-                  <p className="text-sm text-muted max-w-xs text-right">
-                    {item.result}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+        <div className="mt-auto pt-8 flex items-end gap-5">
+          <span className="plate-type font-black text-brand-700 text-4xl sm:text-5xl tabular-nums leading-none">
+            {caso.cifra}
+          </span>
+          <span className="text-sm font-semibold text-ink-600 leading-snug pb-1.5">
+            {caso.cifraPie}
+          </span>
         </div>
       </div>
-    </section>
+
+      {enObra && <div aria-hidden="true" className="h-2.5 hazard" />}
+    </article>
   )
 }
+
+const Cases: React.FC = () => (
+  <section id="funcionando" className="bg-paper-50 py-24 md:py-32">
+    <div className="max-w-[92rem] mx-auto px-5 sm:px-8">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
+        <h2 className="plate-type font-black text-ink-900 text-4xl sm:text-5xl lg:text-6xl max-w-[18ch]">
+          Esto ya está instalado y funcionando
+        </h2>
+        <p className="text-ink-600 leading-relaxed max-w-[38ch]">
+          Cinco negocios de la zona. Cuatro con la máquina puesta y girando;
+          uno todavía en obra, y lo decimos.
+        </p>
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-6">
+        {casos.map((caso) => (
+          <Bahia key={caso.cliente} caso={caso} />
+        ))}
+      </div>
+    </div>
+  </section>
+)
 
 export default Cases

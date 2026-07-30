@@ -2,33 +2,115 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
-}
+/* ============================================================
+   DUALINK · MATERIALES
+   ------------------------------------------------------------
+   Las materias del mundo — rótulo de placa, grabado, balizado y
+   calle pintada. Todas se pintan con los dos colores del logo.
+   ============================================================ */
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+  }
+
   body {
-    @apply bg-paper text-ink font-sans antialiased;
+    @apply bg-paper-50 text-ink-800 font-sans antialiased;
+    /* Archivo es variable en anchura: el cuerpo va normal. */
+    font-variation-settings: 'wdth' 100;
+  }
+
+  :focus-visible {
+    outline: 3px solid theme('colors.brand.700');
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: theme('colors.brand.700');
+    color: #fff;
   }
 }
 
-@layer utilities {
-  .text-balance {
+@layer components {
+  /* ---- Rótulo de placa ----
+     El carácter de placa sale del ANCHO de la letra, no de una
+     fuente de plantilla disfrazada. Archivo abierto al 125%. */
+  .plate-type {
+    font-variation-settings: 'wdth' 125;
+    letter-spacing: theme('letterSpacing.plate');
     text-wrap: balance;
   }
+
+  /* ---- Grabado de placa pequeña ----
+     Sólo para etiquetas cortas. Las mayúsculas frenan la
+     lectura, así que no se ponen encima de frases: el detector
+     marca como "all-caps-body" cualquier tirada larga.
+     Cifras tabulares para que los códigos alineen en columna. */
+  .engraved {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: theme('letterSpacing.stencil');
+    text-transform: uppercase;
+  }
+
+  /* impeccable-disable repeating-stripes-gradient: el balizado es
+     el objeto real de este mundo y lleva significado — marca el
+     único proyecto que todavía no está entregado y el tramo del
+     presupuesto sin cobrar. No es textura de relleno. */
+
+  /* ---- Balizado ----
+     Diagonales de cinta de obra, en pizarra sobre papel. Un solo
+     significado en toda la web: esto todavía no está entregado.
+     Las rayas se ganan aquí porque son el objeto real del mundo,
+     no una textura de fondo puesta por rellenar. */
+  .hazard {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      theme('colors.ink.800') 0 9px,
+      transparent 9px 18px
+    );
+  }
+
+  /* El mismo balizado cuando va encima del bloque azul macizo:
+     las diagonales pasan a blanco para que se sigan viendo. */
+  .hazard-invert {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      #ffffff 0 9px,
+      transparent 9px 18px
+    );
+  }
+
+  /* ---- Calle pintada ----
+     Marca el recorrido de lectura. Se dibuja una vez al entrar
+     y se queda quieta. */
+  .lane {
+    transform-origin: left center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lane-draw {
+      @apply animate-lane;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lane-draw {
+      transform: none;
+    }
+  }
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: theme('colors.paper.100');
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: theme('colors.ink.300');
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: theme('colors.brand.700');
 }

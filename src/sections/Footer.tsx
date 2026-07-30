@@ -1,152 +1,145 @@
-import { Mail, Phone, MapPin } from 'lucide-react'
 import { services } from '../config/services'
-import { contact, site, whatsappHref, waMessages } from '../config/site'
-import WhatsAppIcon from '../components/WhatsAppIcon'
+import { contact, site } from '../config/site'
+import Marca from '../components/Marca'
 
 /* ============================================================
-   DUALINK · PIE
+   DUALINK · PLACA DE CARACTERÍSTICAS
    ------------------------------------------------------------
-   El footer listaba 5 servicios a mano mientras la sección de
-   servicios tenía 6 y el hero 7, todos distintos. Ahora lee del
-   catálogo común. Los datos de contacto tampoco estaban aquí:
-   se añaden, enlazados de verdad, desde config/site.ts.
+   El pie es la chapa atornillada al costado de la máquina: qué
+   es, quién la hizo, dónde y cómo se le reclama.
+
+   Los enlaces legales existen de verdad (antes apuntaban a
+   href="#" y no llevaban a ninguna parte) y la LSSI exige que
+   sean alcanzables desde cualquier página.
+
+   Los servicios se leen del catálogo común. Esto ya estaba
+   arreglado en la versión anterior y se respeta: el pie
+   listaba cinco a mano mientras la sección tenía seis y el
+   hero siete, todos distintos.
    ============================================================ */
 
-const companyLinks = [
-  { label: 'Servicios', href: '#servicios' },
-  { label: 'Proceso', href: '#proceso' },
-  { label: 'Casos de éxito', href: '#resultados' },
+const enlacesLegales = [
+  { label: 'Aviso legal', href: '#/aviso-legal' },
+  { label: 'Privacidad', href: '#/privacidad' },
+  { label: 'Cookies', href: '#/cookies' },
+]
+
+const enlacesEmpresa = [
+  { label: 'Funcionando', href: '#funcionando' },
+  { label: 'Qué instalamos', href: '#servicios' },
+  { label: 'Cómo se paga', href: '#pago' },
   { label: 'Contacto', href: '#contacto' },
 ]
 
-const legalLinks = [
-  { label: 'Aviso legal', href: '#/aviso-legal' },
-  { label: 'Política de privacidad', href: '#/privacidad' },
-  { label: 'Política de cookies', href: '#/cookies' },
-]
+const Columna: React.FC<{ titulo: string; children: React.ReactNode }> = ({
+  titulo,
+  children,
+}) => (
+  <div>
+    <h2 className="engraved text-xs font-bold text-ink-600 pb-3 mb-4 border-b border-ink-200">
+      {titulo}
+    </h2>
+    {children}
+  </div>
+)
 
-const Footer: React.FC = () => {
-  return (
-    <footer className="bg-ink text-white py-16 md:py-20">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-6">
-              <svg viewBox="0 0 100 100" fill="none" className="w-10 h-10" aria-hidden="true">
-                <path
-                  d="M60 20C75 20 85 35 85 50C85 65 75 80 60 80C45 80 35 65 35 50C35 35 45 20 60 20Z"
-                  fill="#334155"
-                />
-                <path
-                  d="M40 30C55 30 65 45 65 60C65 75 55 90 40 90C25 90 15 75 15 60C15 45 25 30 40 30Z"
-                  fill="#1e3a8a"
-                />
-              </svg>
-              <span className="font-display font-bold text-xl tracking-tight">DUALINK</span>
-            </div>
-            <p className="text-slate-400 max-w-sm leading-relaxed mb-8">
-              Agentes de IA, automatización y software a medida. Dejamos de
-              hablar en código y empezamos a hablar en resultados.
-            </p>
-
-            <a
-              href={whatsappHref(waMessages.general)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-[#25D366] text-white text-sm font-semibold rounded-xl hover:bg-[#1eb855] transition-colors"
-            >
-              <WhatsAppIcon className="w-4 h-4 shrink-0" />
-              Hablar por WhatsApp
-            </a>
+const Footer: React.FC = () => (
+  <footer className="bg-white">
+    {/* Franja de la marca. Es un bloque pintado, no un borde:
+        un borde de color grueso en un costado es un tic que el
+        detector marca, y aquí además el material correcto es
+        pintura sobre el suelo. */}
+    <div aria-hidden="true" className="h-1.5 bg-brand-700" />
+    <div className="max-w-[92rem] mx-auto px-5 sm:px-8 py-16 md:py-20">
+      <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+        <div className="lg:col-span-1">
+          <div className="flex items-center gap-2.5 mb-5">
+            <Marca className="w-9 h-9" />
+            <span className="plate-type font-black text-xl text-ink-900">
+              DUALINK
+            </span>
           </div>
-
-          <div>
-            <h4 className="font-semibold mb-4 text-sm tracking-widest uppercase text-slate-500">
-              Servicios
-            </h4>
-            <ul className="space-y-3">
-              {services.map((service) => (
-                <li key={service.id}>
-                  <a
-                    href="#servicios"
-                    className="text-slate-400 hover:text-white transition-colors text-sm"
-                  >
-                    {service.short}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold mb-4 text-sm tracking-widest uppercase text-slate-500">
-              Contacto
-            </h4>
-            <ul className="space-y-3 mb-8">
-              <li>
-                <a
-                  href={`mailto:${contact.email}`}
-                  className="flex items-start gap-2.5 text-slate-400 hover:text-white transition-colors text-sm"
-                >
-                  <Mail className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span className="break-all">{contact.email}</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href={`tel:${contact.phoneDisplay.replace(/\s/g, '')}`}
-                  className="flex items-start gap-2.5 text-slate-400 hover:text-white transition-colors text-sm"
-                >
-                  <Phone className="w-4 h-4 mt-0.5 shrink-0" />
-                  {contact.phoneDisplay}
-                </a>
-              </li>
-              <li className="flex items-start gap-2.5 text-slate-400 text-sm">
-                <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
-                {contact.addressLine}
-              </li>
-            </ul>
-
-            <h4 className="font-semibold mb-4 text-sm tracking-widest uppercase text-slate-500">
-              Empresa
-            </h4>
-            <ul className="space-y-3">
-              {companyLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="text-slate-400 hover:text-white transition-colors text-sm"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-slate-500 text-sm">
-            © {new Date().getFullYear()} {site.name}. Todos los derechos reservados.
+          <p className="text-ink-600 leading-relaxed max-w-[34ch]">
+            Agentes de IA, automatización y software a medida para pymes.
+            Dejamos de hablar en código y empezamos a hablar en resultados.
           </p>
-          {/* Antes estos enlaces apuntaban a href="#" y no llevaban a
-              ninguna parte. Ahora existen los documentos y la LSSI
-              exige que sean accesibles desde cualquier página. */}
-          <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-            {legalLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-slate-500 hover:text-white text-sm transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
         </div>
+
+        <Columna titulo="Qué instalamos">
+          {/* min-h-[44px]: en el pie estos enlaces medían 15 px de
+              alto. Con el pulgar, en un móvil, eso no se acierta. */}
+          <ul>
+            {services.map((service) => (
+              <li key={service.id}>
+                <a
+                  href="#servicios"
+                  className="flex items-center min-h-[44px] text-sm text-ink-600 hover:text-brand-700 transition-colors"
+                >
+                  {service.short}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Columna>
+
+        <Columna titulo="La web">
+          <ul>
+            {enlacesEmpresa.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  className="flex items-center min-h-[44px] text-sm text-ink-600 hover:text-brand-700 transition-colors"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Columna>
+
+        <Columna titulo="Dónde encontrarnos">
+          <ul>
+            <li>
+              <a
+                href={`tel:${contact.phoneDisplay.replace(/\s/g, '')}`}
+                className="flex items-center min-h-[44px] text-sm text-ink-800 font-semibold hover:text-brand-700 transition-colors"
+              >
+                {contact.phoneDisplay}
+              </a>
+            </li>
+            <li>
+              <a
+                href={`mailto:${contact.email}`}
+                className="flex items-center min-h-[44px] text-sm text-ink-800 font-semibold hover:text-brand-700 transition-colors break-all"
+              >
+                {contact.email}
+              </a>
+            </li>
+            <li className="flex items-center min-h-[44px] text-sm text-ink-600">
+              {contact.addressLine}
+            </li>
+          </ul>
+        </Columna>
       </div>
-    </footer>
-  )
-}
+
+      <div className="mt-16 pt-6 border-t border-ink-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <p className="engraved text-xs font-bold text-ink-600">
+          © {new Date().getFullYear()} {site.name}
+        </p>
+        <nav className="flex flex-wrap gap-x-6">
+          {enlacesLegales.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className="engraved inline-flex items-center min-h-[44px] text-xs font-bold text-ink-600 hover:text-brand-700 transition-colors"
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </div>
+  </footer>
+)
 
 export default Footer

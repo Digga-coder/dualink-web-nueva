@@ -14,7 +14,7 @@
       content="Dualink Solutions: agentes de IA que atienden a tus clientes 24/7, automatización, software a medida, diseño web y gestión de redes sociales. Pagas por fases, nunca todo por adelantado. Tudela, Navarra."
     />
     <link rel="canonical" href="https://www.dualinksolutions.com/" />
-    <meta name="theme-color" content="#1e3a8a" />
+    <meta name="theme-color" content="#1E3A8A" />
     <meta name="robots" content="index, follow" />
 
     <!-- Open Graph: controla cómo se ve el enlace al compartirlo por
@@ -33,10 +33,14 @@
     />
     <meta name="twitter:card" content="summary_large_image" />
 
+    <!-- Archivo: grotesco industrial con eje de anchura variable.
+         La misma familia da el cuerpo de lectura (wdth 100) y el
+         rótulo ancho de placa (wdth 125), así que la web entera
+         va con UNA sola descarga de fuente. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..900&display=swap"
       rel="stylesheet"
     />
 
@@ -63,7 +67,39 @@
       }
     </script>
   </head>
-  <body class="bg-paper text-ink antialiased">
+  <body class="bg-paper-50 text-ink-800 antialiased">
+    <!--
+      THESIS: Dualink instala máquinas que trabajan solas en naves,
+      cocinas y almacenes reales, y deja un 30% sin cobrar hasta que
+      el dueño las ve funcionando. La web se lee como el sitio donde
+      esas máquinas viven: un almacén rotulado. Rechaza la landing de
+      IA por defecto (degradado azul-morado, tarjetas de cristal,
+      esfera 3D flotando, Inter).
+
+      OWN-WORLD: paleta EXCLUSIVA del logo — azul marino #1e3a8a y
+      pizarra #1e293b, más neutros de papel; ningún color inventado.
+      Suelo de hormigón claro para que el azul, que es un color
+      oscuro, pueda ocupar bloques macizos con letra blanca (11:1)
+      en vez de apagarse sobre negro. Placas grabadas con cifras
+      tabulares; balizado diagonal en pizarra con un único
+      significado, "en obra"; calles pintadas marcando el recorrido;
+      Archivo abierto a 125 de ancho para el rótulo.
+
+      STORY: el visitante reconoce su propia nave, ve una máquina ya
+      funcionando para alguien de su sector, entiende que un 30% no
+      se paga hasta verla, y abre WhatsApp.
+
+      FIRST VIEWPORT: bahía de hormigón a sangre; una calle azul
+      entra por el borde izquierdo; el titular en bloque de placa;
+      a la derecha, la placa de carga con el 30% retenido; la acción
+      principal es un bloque azul macizo con letra blanca. Sin
+      antetítulo.
+
+      FORM: candidato 5 de 7 (el almacén rotulado); seed 456a5bf3.
+
+      FINISH: unreviewed and undocumented is unfinished; this build
+      ends with the finish review, the verdict, and DESIGN.md.
+    -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

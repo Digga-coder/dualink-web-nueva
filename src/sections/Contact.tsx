@@ -1,123 +1,107 @@
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
-import { Mail, Phone, MapPin, Clock } from 'lucide-react'
+import { Mail, Phone, MapPin } from 'lucide-react'
 import { contact, whatsappHref, waMessages } from '../config/site'
 import WhatsAppIcon from '../components/WhatsAppIcon'
 
 /* ============================================================
-   DUALINK · CONTACTO
+   DUALINK · CIERRE
    ------------------------------------------------------------
-   ⚠️ AQUÍ ESTABA EL AGUJERO PRINCIPAL DE LA WEB.
+   Se mantiene la decisión que ya estaba tomada y que era la
+   correcta: no hay formulario. El anterior hacía preventDefault
+   y enseñaba un tick verde sin enviar nada, así que todo lead
+   que lo rellenó se perdió en silencio y encima se fue creyendo
+   que no le habíamos contestado.
 
-   El formulario anterior NO enviaba nada. Su handleSubmit hacía
-   `e.preventDefault()` y `setSubmitted(true)`, con un comentario
-   "// Aquí iría la lógica de envío real" — y acto seguido le
-   enseñaba al visitante un tick verde y "Mensaje enviado. Te
-   responderemos en menos de 24 horas".
-
-   Es decir: todo lead que rellenó ese formulario se perdió en
-   silencio, y la persona se fue creyendo que había escrito y que
-   no le contestamos. Peor que no tener formulario.
-
-   Sustituido por WhatsApp, que además es el canal por el que ya
-   se trabajan los leads. Sin backend que mantener y sin nada que
-   pueda fallar en silencio: si el enlace se rompe, se ve.
+   Lo que cambia es el peso. Antes esto era un párrafo centrado
+   con un botón. Ahora es el muelle de carga: la última bahía,
+   con la acción a tamaño de puerta. Y las tres vías
+   alternativas dejan de ser tres tarjetas con iconito en
+   cuadradito redondeado para ser tres líneas de placa.
    ============================================================ */
 
-const Contact: React.FC = () => {
-  const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
+const vias = [
+  {
+    icono: Phone,
+    etiqueta: 'Teléfono',
+    valor: contact.phoneDisplay,
+    href: `tel:${contact.phoneDisplay.replace(/\s/g, '')}`,
+  },
+  {
+    icono: Mail,
+    etiqueta: 'Correo',
+    valor: contact.email,
+    href: `mailto:${contact.email}`,
+  },
+  {
+    icono: MapPin,
+    etiqueta: 'Dónde estamos',
+    valor: contact.addressLine,
+    href: null,
+  },
+]
 
-  return (
-    <section id="contacto" ref={ref} className="py-24 md:py-32 bg-white relative overflow-hidden">
-      {/* Halo decorativo */}
-      <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[80vw] h-[40vw] max-w-[900px] rounded-full bg-brand-50/60 blur-3xl pointer-events-none" />
+const Contact: React.FC = () => (
+  <section id="contacto" className="relative bg-paper-100 py-24 md:py-32 overflow-hidden">
+    <div
+      aria-hidden="true"
+      className="absolute right-0 top-[22%] h-1.5 w-[34vw] bg-brand-700"
+    />
 
-      <div className="relative max-w-4xl mx-auto px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="text-sm font-semibold tracking-widest uppercase text-muted mb-4 block">
-            Contacto
-          </span>
-          <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-ink mb-6 leading-tight text-balance">
-            Cuéntanos tu problema.<br />
-            <span className="text-brand-600">Nosotros diseñamos la solución.</span>
-          </h2>
-          <p className="text-lg md:text-xl text-muted leading-relaxed max-w-2xl mx-auto mb-10 font-light">
-            Escríbenos por WhatsApp y te decimos en la misma conversación si
-            podemos ayudarte, cómo y cuánto cuesta. Sin formularios, sin
-            compromiso y sin marearte con tecnicismos.
-          </p>
-        </motion.div>
+    <div className="relative max-w-[92rem] mx-auto px-5 sm:px-8">
+      <h2 className="plate-type font-black text-ink-900 text-[2.75rem] sm:text-6xl lg:text-7xl leading-[0.92] max-w-[16ch]">
+        Cuéntanos qué te come el día
+      </h2>
 
-        {/* ===== ACCIÓN PRINCIPAL ===== */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.15 }}
-          className="flex flex-col items-center gap-4"
-        >
-          <a
-            href={whatsappHref(waMessages.budget)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-3 px-10 py-5 bg-[#25D366] text-white text-lg font-semibold rounded-2xl hover:bg-[#1eb855] transition-all duration-300 shadow-xl shadow-[#25D366]/25 hover:shadow-2xl hover:shadow-[#25D366]/30 hover:-translate-y-0.5"
-          >
-            <WhatsAppIcon className="w-6 h-6 shrink-0" />
-            Pedir presupuesto por WhatsApp
-          </a>
+      <p className="mt-8 text-lg sm:text-xl text-ink-700 leading-relaxed max-w-[52ch]">
+        Escríbenos por WhatsApp y te decimos en la misma conversación si
+        podemos ayudarte, cómo y cuánto cuesta. Sin formularios, sin
+        compromiso y sin marearte con tecnicismos. Solemos contestar el mismo
+        día.
+      </p>
 
-          <span className="inline-flex items-center gap-2 text-sm text-muted">
-            <Clock className="w-4 h-4 shrink-0" />
-            Solemos responder el mismo día
-          </span>
-        </motion.div>
+      <a
+        href={whatsappHref(waMessages.budget)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="engraved mt-12 inline-flex items-center justify-center gap-4 w-full sm:w-auto min-h-[72px] px-10 bg-brand-700 text-white text-base sm:text-lg font-black hover:bg-brand-800 transition-colors shadow-plate"
+      >
+        <WhatsAppIcon className="w-6 h-6 shrink-0" />
+        Abrir WhatsApp
+      </a>
 
-        {/* ===== VÍAS ALTERNATIVAS =====
-            Para quien no use WhatsApp. Todo enlazado de verdad:
-            los datos salen de config/site.ts. */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-16 pt-12 border-t border-slate-100"
-        >
-          <a
-            href={`mailto:${contact.email}`}
-            className="group flex flex-col items-center gap-3 p-6 rounded-2xl hover:bg-slate-50 transition-colors"
-          >
-            <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600 group-hover:bg-brand-100 transition-colors">
-              <Mail className="w-5 h-5" />
+      <dl className="mt-16 border-t-2 border-ink-200 grid sm:grid-cols-3">
+        {vias.map(({ icono: Icono, etiqueta, valor, href }) => {
+          const contenido = (
+            <>
+              <dt className="engraved flex items-center gap-2.5 text-xs font-bold text-ink-600">
+                <Icono className="w-4 h-4 shrink-0" />
+                {etiqueta}
+              </dt>
+              <dd className="mt-2 text-ink-800 font-semibold break-words">
+                {valor}
+              </dd>
+            </>
+          )
+
+          return href ? (
+            <a
+              key={etiqueta}
+              href={href}
+              className="py-6 sm:px-6 sm:first:pl-0 border-b sm:border-b-0 sm:border-l first:border-l-0 border-ink-200 hover:bg-paper-100 transition-colors"
+            >
+              {contenido}
+            </a>
+          ) : (
+            <div
+              key={etiqueta}
+              className="py-6 sm:px-6 sm:border-l border-ink-200"
+            >
+              {contenido}
             </div>
-            <span className="text-sm text-muted">Email</span>
-            <span className="text-ink font-medium break-all">{contact.email}</span>
-          </a>
-
-          <a
-            href={`tel:${contact.phoneDisplay.replace(/\s/g, '')}`}
-            className="group flex flex-col items-center gap-3 p-6 rounded-2xl hover:bg-slate-50 transition-colors"
-          >
-            <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600 group-hover:bg-brand-100 transition-colors">
-              <Phone className="w-5 h-5" />
-            </div>
-            <span className="text-sm text-muted">Teléfono</span>
-            <span className="text-ink font-medium">{contact.phoneDisplay}</span>
-          </a>
-
-          <div className="flex flex-col items-center gap-3 p-6">
-            <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600">
-              <MapPin className="w-5 h-5" />
-            </div>
-            <span className="text-sm text-muted">Dónde estamos</span>
-            <span className="text-ink font-medium">{contact.addressLine}</span>
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
+          )
+        })}
+      </dl>
+    </div>
+  </section>
+)
 
 export default Contact
