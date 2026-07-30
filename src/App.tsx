@@ -4,13 +4,17 @@ import Agente from './sections/Agente'
 import Cases from './sections/Cases'
 import Services from './sections/Services'
 import Process from './sections/Process'
+import Objeciones from './sections/Objeciones'
 import Contact from './sections/Contact'
 import Footer from './sections/Footer'
 import FloatingWhatsApp from './components/FloatingWhatsApp'
 import AvisoLegal from './pages/AvisoLegal'
 import PoliticaPrivacidad from './pages/PoliticaPrivacidad'
 import PoliticaCookies from './pages/PoliticaCookies'
+import NichoLanding from './pages/NichoLanding'
+import { nichoPorSlug } from './config/nichos'
 import { useHashRoute } from './lib/useHashRoute'
+import { useMedicion } from './lib/useMedicion'
 
 /* ============================================================
    Orden de la home.
@@ -42,6 +46,7 @@ function Home() {
       <Cases />
       <Services />
       <Process />
+      <Objeciones />
       <Contact />
       <Footer />
       <FloatingWhatsApp />
@@ -51,13 +56,29 @@ function Home() {
 
 function App() {
   const route = useHashRoute()
+  useMedicion()
+
+  if (route.tipo === 'legal') {
+    return (
+      <div className="relative">
+        {route.pagina === 'aviso-legal' && <AvisoLegal />}
+        {route.pagina === 'privacidad' && <PoliticaPrivacidad />}
+        {route.pagina === 'cookies' && <PoliticaCookies />}
+      </div>
+    )
+  }
+
+  if (route.tipo === 'nicho') {
+    const nicho = nichoPorSlug(route.slug)
+    /* Si el slug no existe cae en la home. No hay 404 posible:
+       estas URLs se pegan en anuncios y en mensajes, y un enlace
+       roto ahí es un lead perdido. */
+    if (nicho) return <NichoLanding nicho={nicho} />
+  }
 
   return (
     <div className="relative">
-      {route === 'aviso-legal' && <AvisoLegal />}
-      {route === 'privacidad' && <PoliticaPrivacidad />}
-      {route === 'cookies' && <PoliticaCookies />}
-      {route === 'home' && <Home />}
+      <Home />
     </div>
   )
 }

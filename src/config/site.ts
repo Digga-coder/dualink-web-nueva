@@ -13,6 +13,8 @@
    que no existían.
    ============================================================ */
 
+import { refVisita } from '../lib/tracking'
+
 export const site = {
   name: 'Dualink Solutions',
   shortName: 'DUALINK',
@@ -39,10 +41,21 @@ export const contact = {
   addressRegion: 'Navarra, España',
 } as const
 
-/* Número en formato legible para el usuario, derivado del de
-   WhatsApp: evita que ambos se desincronicen. */
-export const whatsappHref = (message: string) =>
-  `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(message)}`
+/* Enlace a WhatsApp con el mensaje prerrellenado.
+
+   Al final del mensaje se cuela la referencia de la visita
+   —"(ref: DL-7F3K2)"— para que, cuando la persona pulse enviar,
+   podáis unir esa conversación con lo que había leído en la web
+   antes de decidirse. Ver src/lib/tracking.ts.
+
+   Va entre paréntesis y en una línea aparte para que se lea como
+   lo que es: una referencia, no un texto raro que la persona
+   tenga que entender. Nadie borra un "(ref: ...)" antes de dar a
+   enviar, y si lo borra tampoco pasa nada. */
+export const whatsappHref = (message: string) => {
+  const texto = `${message}\n\n(ref: ${refVisita})`
+  return `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(texto)}`
+}
 
 /* Mensajes prerrellenados. Cada punto de entrada manda un texto
    distinto para que sepáis de qué parte de la web viene el lead

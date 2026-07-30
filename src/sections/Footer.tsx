@@ -1,4 +1,5 @@
 import { services } from '../config/services'
+import { nichos } from '../config/nichos'
 import { contact, site } from '../config/site'
 import Marca from '../components/Marca'
 
@@ -52,7 +53,7 @@ const Footer: React.FC = () => (
         pintura sobre el suelo. */}
     <div aria-hidden="true" className="h-1.5 bg-brand-700" />
     <div className="max-w-[92rem] mx-auto px-5 sm:px-8 py-16 md:py-20">
-      <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5">
         <div className="lg:col-span-1">
           <div className="flex items-center gap-2.5 mb-5">
             <Marca className="w-9 h-9" />
@@ -77,6 +78,24 @@ const Footer: React.FC = () => (
                   className="flex items-center min-h-[44px] text-sm text-ink-600 hover:text-brand-700 transition-colors"
                 >
                   {service.short}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Columna>
+
+        {/* Las landings de sector cuelgan del pie para que Google
+            las encuentre desde la madre. El tráfico dirigido entra
+            por su URL directa, no por aquí. */}
+        <Columna titulo="Por sector">
+          <ul>
+            {nichos.map((n) => (
+              <li key={n.slug}>
+                <a
+                  href={`#/${n.slug}`}
+                  className="flex items-center min-h-[44px] text-sm text-ink-600 hover:text-brand-700 transition-colors"
+                >
+                  {n.sector}
                 </a>
               </li>
             ))}

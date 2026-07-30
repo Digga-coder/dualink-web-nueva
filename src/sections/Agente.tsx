@@ -124,7 +124,10 @@ const Burbuja: React.FC<{ turno: Turno; visible: boolean; retardo: number }> = (
   )
 }
 
-const Hilo: React.FC<{ conv: Conversacion }> = ({ conv }) => {
+/* Se exporta porque las landings de nicho enseñan el hilo de su
+   sector arriba del todo. Un solo componente para los dos sitios:
+   si mañana cambia la forma del hilo, cambia en todas partes. */
+export const Hilo: React.FC<{ conv: Conversacion }> = ({ conv }) => {
   const ref = useRef<HTMLDivElement>(null)
   const total = conv.turnos.length
   /* `armado` es lo que autoriza a esconder los mensajes. Sin él,
